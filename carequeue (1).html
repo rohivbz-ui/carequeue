@@ -1,0 +1,2448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CareQueue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&family=Noto+Sans+Tamil:wght@400;600&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#170B33;--ink2:#26154D;--violet:#6B3FD9;--violet-d:#5230B5;--lilac:#EDE7FB;--lilac2:#DCD0F8;--paper:#F6F4FB;--text:#1E1535;--muted:#6A6383;--line:#E3DDF1;--red:#D6334A;--red-bg:#FDECEF;--green:#0E8A66;--green-bg:#E2F5EE;--amber:#9A6200;--amber-bg:#FFF2D6;--blue:#2A5BD7;--blue-bg:#E7EEFC;--gray-bg:#EEECF3;--r:14px;
+--fh:'Bricolage Grotesque','Figtree','Noto Sans Tamil','Noto Sans Devanagari',system-ui,sans-serif;
+--fb:'Figtree','Noto Sans Tamil','Noto Sans Devanagari',system-ui,-apple-system,'Segoe UI',sans-serif}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font-family:var(--fb);color:var(--text);background:var(--paper);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--fh);letter-spacing:-.01em}
+button,input,select,textarea{font:inherit;color:inherit}
+.hidden{display:none!important}
+.ic{flex:none;vertical-align:-3px}
+.muted{color:var(--muted);font-size:14px}
+.grow{flex:1;min-width:0}
+.right{text-align:right}
+.mt{margin-top:14px}
+:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
+
+/* buttons & forms */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--violet);color:#fff;border:1px solid var(--violet);border-radius:10px;padding:10px 16px;font-weight:600;cursor:pointer;transition:background .15s}
+.btn:hover{background:var(--violet-d)}
+.btn.ghost{background:transparent;color:var(--violet);border-color:var(--lilac2)}
+.btn.ghost:hover{background:var(--lilac)}
+.btn.danger{background:var(--red);border-color:var(--red)}
+.btn.danger:hover{background:#b92439}
+.btn.sm{padding:6px 11px;font-size:13px;border-radius:8px}
+.btn.block{width:100%}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.f{display:grid;gap:14px}
+.f label{display:grid;gap:6px;font-weight:600;font-size:14px}
+input,select,textarea{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 12px;width:100%}
+textarea{min-height:80px;resize:vertical}
+.inline{display:flex;gap:8px}
+.inline input{flex:1}
+.err-t{color:var(--red);font-size:14px;min-height:20px}
+.linkbtn{background:none;border:0;color:var(--violet);font-weight:600;cursor:pointer;padding:4px 0}
+.linkbtn:hover{text-decoration:underline}
+.langsel{width:auto;padding:7px 10px;border-radius:9px;font-size:14px}
+
+/* gate */
+#gate{min-height:100%;display:grid;grid-template-columns:1.05fr 1fr}
+.gate-l{background:var(--ink);color:#fff;padding:44px 56px;display:flex;flex-direction:column;justify-content:space-between;gap:40px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--fh);font-weight:700;font-size:21px}
+.gate-l h2{font-size:clamp(34px,4.4vw,58px);line-height:1.03;letter-spacing:-.025em;max-width:11em;margin-bottom:16px}
+.gate-l p{color:#CDC1EC;max-width:32em;font-size:16px}
+.mock{margin-top:34px;width:290px;background:#fff;color:var(--text);border-radius:16px;transform:rotate(-2.5deg);box-shadow:0 18px 40px rgba(0,0,0,.35);position:relative}
+.mock .m-top{padding:16px 18px 14px}
+.mock small{display:block;color:var(--muted);font-size:12px}
+.mock .code{font-family:var(--fh);font-size:30px;font-weight:700;letter-spacing:.01em;margin:2px 0 6px}
+.mock .m-bot{display:flex;gap:26px;padding:12px 18px 16px}
+.mock .m-bot b{font-family:var(--fh);font-size:22px}
+.gate-r{display:flex;flex-direction:column;padding:24px 40px 32px}
+.gate-top{display:flex;justify-content:flex-end}
+.gate-form{margin:auto;width:100%;max-width:400px;padding:24px 0}
+.gate-form h1{font-size:30px;margin-bottom:6px}
+.gate-form .lead{color:var(--muted);margin-bottom:20px}
+.gate-form .f{margin-bottom:8px}
+.divider{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:13px;margin:20px 0}
+.divider:before,.divider:after{content:"";flex:1;height:1px;background:var(--line)}
+.staff-entry{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--ink);color:#fff;border:0;border-radius:12px;padding:14px 16px;cursor:pointer}
+.staff-entry:hover{background:var(--ink2)}
+.staff-entry span{display:block;font-size:13px;color:#BFB1E6;font-weight:400}
+.staff-entry strong{display:block}
+.roles{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 16px}
+.roles button{border:1px solid var(--line);background:#fff;border-radius:99px;padding:5px 12px;font-size:13px;cursor:pointer}
+.roles button.on{background:var(--lilac);border-color:var(--violet);color:var(--violet-d);font-weight:600}
+.demo-note{background:var(--lilac);border-radius:10px;padding:10px 12px;font-size:13px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+
+/* app shell */
+#app{display:grid;grid-template-columns:262px minmax(0,1fr);min-height:100%}
+.side{background:var(--ink);color:#D9CFF3;position:sticky;top:0;height:100vh;overflow:auto;padding:18px 14px;display:flex;flex-direction:column}
+.side .brand{color:#fff;padding:2px 8px 14px;font-size:19px}
+.rolechip{margin:0 8px 8px;font-size:13px;color:#BFB1E6}
+.nav{display:flex;flex-direction:column;gap:2px;flex:1}
+.nav-g{font-size:12.5px;color:#9A8CC4;padding:14px 10px 4px}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;color:#D9CFF3;cursor:pointer;font-weight:500}
+.nav a:hover{background:rgba(255,255,255,.07)}
+.nav a.on{background:var(--violet);color:#fff}
+.side .out{margin-top:12px;border-top:1px solid rgba(255,255,255,.12);padding-top:10px}
+.topbar{display:flex;align-items:center;gap:12px;padding:12px 28px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+.ttl{font-family:var(--fh);font-weight:700;font-size:17px}
+.userchip{display:flex;align-items:center;gap:6px;background:var(--lilac);border-radius:99px;padding:5px 12px;font-size:14px;font-weight:600;max-width:200px}
+.userchip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.menu-btn{display:none;background:none;border:0;cursor:pointer;padding:4px}
+.scrim{display:none}
+.main{padding:28px;max-width:1140px}
+.staff .side{background:#100622}
+.staff .topbar{background:var(--ink2);color:#fff;border-color:transparent}
+.staff .userchip{background:rgba(255,255,255,.14)}
+.staff .langsel{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)}
+.staff .langsel option{color:#000}
+.staff .menu-btn{color:#fff}
+.staff .main{max-width:1260px}
+.staff body,body.staff{background:#F1EEF8}
+
+/* layout bits */
+.pagehead{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.pagehead h1{font-size:28px;line-height:1.15}
+.sub{color:var(--muted);margin-top:4px}
+.sh{font-size:17px;margin:26px 0 10px}
+.sh:first-child{margin-top:0}
+.cols{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:28px;align-items:start}
+.cols.even{grid-template-columns:repeat(2,minmax(0,1fr))}
+.panel{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:20px;margin-bottom:18px}
+.panel h2{font-size:17px;margin-bottom:12px}
+.panel>.tw{margin:0 -8px}
+.list{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:0 18px}
+.li{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.li:last-child{border-bottom:0}
+.hicon{width:44px;height:44px;border-radius:12px;background:var(--lilac);color:var(--violet);display:grid;place-items:center;flex:none}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.chip{background:var(--lilac);color:var(--violet-d);border-radius:99px;padding:2px 10px;font-size:12.5px;font-weight:600}
+.empty{background:#fff;border:1px dashed var(--lilac2);border-radius:var(--r);padding:26px;text-align:center;color:var(--muted)}
+.empty .btn{margin-top:12px}
+.searchbox{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:0 12px;margin-bottom:14px}
+.searchbox input{border:0;padding:11px 4px;outline:0}
+.searchbox:focus-within{border-color:var(--violet)}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.filters .searchbox{flex:1;min-width:200px;margin:0}
+.filters select{width:auto;min-width:160px}
+.sosbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:var(--red-bg);border:1px solid #F5C2CB;border-radius:var(--r);padding:14px 18px;margin-bottom:26px}
+.sosbar span{display:block;color:#7c2331;font-size:14px}
+.quick{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.quick a{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--line);cursor:pointer;font-weight:500}
+.quick a:last-child{border-bottom:0}
+.quick a span{flex:1}
+.quick a:hover{background:var(--lilac)}
+.quick a .ic:first-child{color:var(--violet)}
+.alert{border-radius:10px;padding:11px 14px;margin-bottom:16px;font-weight:500}
+.alert.err{background:var(--red-bg);color:#8f1f31;border:1px solid #F5C2CB}
+.alert.ok{background:var(--green-bg);color:#0a6b4e;border:1px solid #BCE5D6}
+.alert.info{background:var(--blue-bg);color:#1f47ad;border:1px solid #C6D6F7}
+
+/* stats, tables, badges */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.stat b{display:block;font-family:var(--fh);font-size:28px;line-height:1.1}
+.stat span{color:var(--muted);font-size:13.5px;display:flex;align-items:center;gap:6px;margin-top:4px}
+.stat.alertish b{color:var(--red)}
+.tw{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:14.5px}
+.tbl th{text-align:left;font-weight:600;color:var(--muted);font-size:13px;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td.act{white-space:nowrap}
+.tbl td.act .btn{margin-right:4px}
+.badge{display:inline-block;border-radius:99px;padding:2px 10px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.badge.amber{background:var(--amber-bg);color:var(--amber)}
+.badge.blue{background:var(--blue-bg);color:var(--blue)}
+.badge.violet{background:var(--lilac);color:var(--violet-d)}
+.badge.green{background:var(--green-bg);color:var(--green)}
+.badge.red{background:var(--red-bg);color:var(--red)}
+.badge.gray{background:var(--gray-bg);color:var(--muted)}
+.bar{height:8px;border-radius:99px;background:var(--lilac);overflow:hidden;min-width:90px}
+.bar i{display:block;height:100%;background:var(--violet);border-radius:99px}
+.bar.low i{background:var(--red)}
+.bedrow{display:flex;align-items:center;gap:14px;padding:9px 0}
+.bedrow .nm{width:110px;font-weight:500}
+.bedrow .bar{flex:1}
+.bedrow .ct{width:70px;text-align:right;font-variant-numeric:tabular-nums;font-size:14px}
+.price{font-weight:700;font-variant-numeric:tabular-nums}
+.stepper{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.stepper button{background:#fff;border:0;width:32px;height:32px;cursor:pointer;font-size:18px}
+.stepper button:hover{background:var(--lilac)}
+.stepper span{min-width:30px;text-align:center;font-weight:600}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:18px;overflow-x:auto}
+.tabs button{background:none;border:0;padding:10px 14px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.tabs button.on{color:var(--violet-d);border-color:var(--violet)}
+.steps{display:flex;gap:4px;margin-top:8px}
+.steps i{flex:1;height:6px;border-radius:99px;background:var(--lilac)}
+.steps i.done{background:var(--violet)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:14px}
+.kv dt{color:var(--muted)}
+.kv dd{font-weight:600;margin:0;overflow-wrap:anywhere}
+
+/* ticket */
+.ticket{background:#fff;border-radius:18px;border:1px solid var(--line);position:relative;max-width:540px}
+.tk-top{padding:22px 24px 18px}
+.tk-hosp{color:var(--muted);font-size:14px}
+.tk-code{font-family:var(--fh);font-weight:700;font-size:clamp(34px,7vw,46px);letter-spacing:.01em;line-height:1.1;margin:4px 0 10px}
+.tk-line{margin-top:12px;font-weight:600}
+.perf{position:relative;border-top:2px dashed var(--lilac2)}
+.perf:before,.perf:after{content:"";position:absolute;top:-11px;width:20px;height:20px;border-radius:50%;background:var(--paper);border:1px solid var(--line)}
+.perf:before{left:-11px;clip-path:inset(0 0 0 50%)}
+.perf:after{right:-11px;clip-path:inset(0 50% 0 0)}
+.staff .perf:before,.staff .perf:after{background:#F1EEF8}
+.tk-bot{display:flex;gap:22px;padding:20px 24px 24px;flex-wrap:wrap;align-items:flex-start}
+.qrbox{width:176px;height:176px;flex:none;display:grid;place-items:center}
+.qrbox img,.qrbox canvas{max-width:100%}
+.qrfallback{font-size:13px;color:var(--muted);text-align:center;border:1px dashed var(--lilac2);border-radius:10px;padding:12px}
+.tk-bot .kv{flex:1;min-width:220px}
+
+/* misc */
+.order{padding:16px 0;border-bottom:1px solid var(--line)}
+.order:last-child{border-bottom:0}
+.sosbtn{width:190px;height:190px;border-radius:50%;background:var(--red);color:#fff;border:0;font-family:var(--fh);font-size:40px;font-weight:700;cursor:pointer;box-shadow:0 0 0 14px var(--red-bg),0 0 0 15px #F5C2CB;margin:18px auto 34px;display:block}
+.sosbtn:hover{background:#b92439}
+#reader{width:100%;max-width:420px;min-height:250px;border-radius:14px;overflow:hidden;background:var(--ink);color:#CDC1EC;display:grid;place-items:center;text-align:center;padding:16px}
+#reader video{max-width:100%}
+#toasts{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);display:grid;gap:8px;z-index:100;width:min(92vw,460px)}
+.toast{background:var(--ink);color:#fff;border-radius:11px;padding:12px 16px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:tin .18s ease-out}
+.toast.error{background:var(--red)}
+.toast.warn{background:#8a5a00}
+.toast.ok{background:var(--ink)}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+@media (max-width:900px){
+ #gate{grid-template-columns:1fr}
+ .gate-l{padding:26px 22px 30px;gap:22px}
+ .mock{display:none}
+ .gate-r{padding:18px 20px 28px}
+ #app{grid-template-columns:1fr}
+ .side{position:fixed;left:0;top:0;bottom:0;width:272px;z-index:50;transform:translateX(-102%);transition:transform .2s}
+ .side.open{transform:none}
+ .scrim.open{display:block;position:fixed;inset:0;background:rgba(23,11,51,.5);z-index:45}
+ .menu-btn{display:inline-flex}
+ .topbar{padding:10px 16px}
+ .main{padding:20px 16px}
+ .cols,.cols.even{grid-template-columns:1fr}
+ .userchip{display:none}
+}
+@media (max-width:520px){
+ .pagehead h1{font-size:24px}
+ .btns .btn{flex:1}
+ .inline{flex-direction:column}
+ .li .btns{width:100%}
+ .tk-bot{justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== AUTH GATE ===== -->
+<div id="gate">
+  <section class="gate-l">
+    <div class="brand"><span class="logo"></span>CareQueue</div>
+    <div>
+      <h2 data-i18n="hero_h"></h2>
+      <p data-i18n="app_tag"></p>
+      <div class="mock" aria-hidden="true">
+        <div class="m-top"><small>CityCare Multispecialty Hospital</small><div class="code">CITY-CAR-014</div><span class="badge violet" data-i18n="st_In Queue"></span></div>
+        <div class="perf"></div>
+        <div class="m-bot"><div><small data-i18n="position"></small><b>3</b></div><div><small data-i18n="est_wait"></small><b>24 <span data-i18n="min" style="font-size:14px;font-weight:500"></span></b></div></div>
+      </div>
+    </div>
+    <div></div>
+  </section>
+
+  <section class="gate-r">
+    <div class="gate-top"><select class="langsel" id="langGate" aria-label="Language" onchange="setLang(this.value)"></select></div>
+
+    <!-- Patient login (only role on this screen) -->
+    <div class="gate-form" id="gPatient">
+      <h1 id="pTitle"></h1>
+      <p class="lead" data-i18n="patient_lead"></p>
+      <div class="f">
+        <div id="regFields" class="f hidden">
+          <label><span data-i18n="fullname"></span><input id="pName" autocomplete="name"></label>
+          <label><span data-i18n="phone"></span><input id="pPhone" inputmode="tel" autocomplete="tel"></label>
+        </div>
+        <label><span data-i18n="email"></span><input id="pEmail" type="email" autocomplete="email"></label>
+        <label><span data-i18n="password"></span><input id="pPw" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')patientAuth()"></label>
+        <div class="err-t" id="pErr" role="alert"></div>
+        <button class="btn block" id="pSubmit" onclick="patientAuth()"></button>
+      </div>
+      <div class="btns" style="justify-content:space-between;margin-top:6px">
+        <button class="linkbtn" id="pSwitch" onclick="setGateMode(gateMode==='login'?'register':'login')"></button>
+        <button class="linkbtn" id="demoBtn" onclick="demoPatient()" data-i18n="demo_patient"></button>
+      </div>
+      <div class="divider"><span data-i18n="or"></span></div>
+      <button class="staff-entry" onclick="openStaffPortal()">
+        <span class="ico"></span>
+        <div><strong data-i18n="staff_portal"></strong><span data-i18n="staff_hint"></span></div>
+      </button>
+    </div>
+
+    <!-- Hospital staff portal login (separate screen) -->
+    <div class="gate-form hidden" id="gStaff">
+      <h1 id="sTitle"></h1>
+      <p class="lead" id="sRole"></p>
+      <div class="f">
+        <label><span id="sIdLabel"></span><input id="sId" autocomplete="username" autocapitalize="characters"></label>
+        <label><span data-i18n="password"></span><input id="sPw" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')staffAuth()"></label>
+        <div class="err-t" id="sErr" role="alert"></div>
+        <button class="btn block" onclick="staffAuth()" data-i18n="login"></button>
+        <button class="btn ghost block" onclick="backToPatient()" data-i18n="back_patient"></button>
+      </div>
+      <div class="demo-note mt"><span id="sDemo"></span><button class="linkbtn" onclick="fillDemoStaff()" data-i18n="fill"></button></div>
+      <div class="divider"><span data-i18n="partner_access"></span></div>
+      <div class="roles" id="roleBtns">
+        <button data-role="hospital" onclick="setStaffRole('hospital')" data-i18n="r_hospital"></button>
+        <button data-role="admin" onclick="setStaffRole('admin')" data-i18n="r_admin"></button>
+        <button data-role="delivery" onclick="setStaffRole('delivery')" data-i18n="r_delivery"></button>
+        <button data-role="ambulance" onclick="setStaffRole('ambulance')" data-i18n="r_ambulance"></button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ===== APPLICATION SHELL ===== -->
+<div id="app" class="hidden">
+  <div class="scrim" id="scrim" onclick="toggleMenu(false)"></div>
+  <aside class="side" id="side">
+    <div class="brand"><span class="logo"></span>CareQueue</div>
+    <div class="rolechip" id="roleChip"></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="nav out"><a onclick="logout()" id="logoutLink"></a></div>
+  </aside>
+  <div style="min-width:0">
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" onclick="toggleMenu(true)" aria-label="Menu"></button>
+      <div class="ttl" id="pageTitle"></div>
+      <div class="grow"></div>
+      <select class="langsel" id="langApp" aria-label="Language" onchange="setLang(this.value)"></select>
+      <div class="userchip" id="userChip"></div>
+    </header>
+    <main class="main" id="main" tabindex="-1"></main>
+  </div>
+</div>
+<div id="toasts" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<script>
+'use strict';
+/* =========================================================
+   CareQueue - single-file healthcare platform prototype
+   Roles: patient | hospital | admin | delivery | ambulance
+   Data: localStorage (shared demo DB)  Session: sessionStorage
+   ========================================================= */
+const LS_DB='carequeue_db_v2', SS_KEY='carequeue_session', LS_LANG='carequeue_lang';
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const TODAY=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
+const uid=p=>p+Math.random().toString(36).slice(2,8);
+
+/* ---------- translations: key -> [English, Tamil, Hindi] ---------- */
+const L={
+"app_tag": [
+"One healthcare platform connecting patients, hospitals, emergency services and medicine delivery.",
+"நோயாளிகள், மருத்துவமனைகள், அவசர சேவைகள் மற்றும் மருந்து விநியோகத்தை இணைக்கும் ஒரே சுகாதார தளம்.",
+"मरीज़ों, अस्पतालों, आपातकालीन सेवाओं और दवा वितरण को जोड़ने वाला एक ही स्वास्थ्य मंच।"
+],
+"hero_h": [
+"Know your turn before you leave home.",
+"வீட்டை விட்டு கிளம்பும் முன்பே உங்கள் முறையை அறியுங்கள்.",
+"घर से निकलने से पहले अपनी बारी जानें।"
+],
+"patient_login": [
+"Patient login",
+"நோயாளி உள்நுழைவு",
+"मरीज़ लॉगिन"
+],
+"patient_lead": [
+"Get a queue token, book doctors and order medicines.",
+"வரிசை டோக்கன் பெறுங்கள், மருத்துவரை முன்பதிவு செய்யுங்கள், மருந்துகளை ஆர்டர் செய்யுங்கள்.",
+"कतार टोकन लें, डॉक्टर बुक करें और दवाइयाँ ऑर्डर करें।"
+],
+"create_account_h": [
+"Create your account",
+"உங்கள் கணக்கை உருவாக்குங்கள்",
+"अपना खाता बनाएँ"
+],
+"email": [
+"Email",
+"மின்னஞ்சல்",
+"ईमेल"
+],
+"password": [
+"Password",
+"கடவுச்சொல்",
+"पासवर्ड"
+],
+"fullname": [
+"Full name",
+"முழு பெயர்",
+"पूरा नाम"
+],
+"phone": [
+"Phone",
+"தொலைபேசி",
+"फ़ोन"
+],
+"login": [
+"Log in",
+"உள்நுழை",
+"लॉग इन"
+],
+"register": [
+"Create account",
+"கணக்கை உருவாக்கு",
+"खाता बनाएँ"
+],
+"to_register": [
+"New here? Create an account",
+"புதியவரா? கணக்கை உருவாக்குங்கள்",
+"नए हैं? खाता बनाएँ"
+],
+"to_login": [
+"Already registered? Log in",
+"ஏற்கனவே பதிவு செய்தீர்களா? உள்நுழையுங்கள்",
+"पहले से पंजीकृत हैं? लॉग इन करें"
+],
+"demo_patient": [
+"Continue as demo patient",
+"டெமோ நோயாளியாக தொடரவும்",
+"डेमो मरीज़ के रूप में जारी रखें"
+],
+"or": [
+"or",
+"அல்லது",
+"या"
+],
+"staff_portal": [
+"Hospital Staff Portal",
+"மருத்துவமனை பணியாளர் தளம்",
+"अस्पताल स्टाफ पोर्टल"
+],
+"staff_hint": [
+"For hospital teams and service partners",
+"மருத்துவமனை குழுக்கள் மற்றும் சேவை கூட்டாளிகளுக்கு",
+"अस्पताल टीमों और सेवा भागीदारों के लिए"
+],
+"staff_login": [
+"Staff login",
+"பணியாளர் உள்நுழைவு",
+"स्टाफ लॉगिन"
+],
+"hospital_id": [
+"Hospital ID",
+"மருத்துவமனை ஐடி",
+"अस्पताल आईडी"
+],
+"staff_id": [
+"Partner ID",
+"கூட்டாளர் ஐடி",
+"पार्टनर आईडी"
+],
+"back_patient": [
+"Back to Patient Login",
+"நோயாளி உள்நுழைவுக்கு திரும்பு",
+"मरीज़ लॉगिन पर वापस"
+],
+"partner_access": [
+"Partner access",
+"கூட்டாளர் அணுகல்",
+"पार्टनर एक्सेस"
+],
+"r_hospital": [
+"Hospital",
+"மருத்துவமனை",
+"अस्पताल"
+],
+"r_admin": [
+"Admin",
+"நிர்வாகி",
+"एडमिन"
+],
+"r_delivery": [
+"Delivery",
+"விநியோகம்",
+"डिलीवरी"
+],
+"r_ambulance": [
+"Ambulance",
+"ஆம்புலன்ஸ்",
+"एम्बुलेंस"
+],
+"portal_patient": [
+"Patient portal",
+"நோயாளி தளம்",
+"मरीज़ पोर्टल"
+],
+"portal_hospital": [
+"Hospital operations",
+"மருத்துவமனை செயல்பாடுகள்",
+"अस्पताल संचालन"
+],
+"portal_admin": [
+"Platform admin",
+"தள நிர்வாகம்",
+"प्लेटफ़ॉर्म एडमिन"
+],
+"portal_delivery": [
+"Medicine delivery",
+"மருந்து விநியோகம்",
+"दवा डिलीवरी"
+],
+"portal_ambulance": [
+"Ambulance dispatch",
+"ஆம்புலன்ஸ் அனுப்புதல்",
+"एम्बुलेंस डिस्पैच"
+],
+"demo_creds": [
+"Demo credentials",
+"டெமோ சான்றுகள்",
+"डेमो क्रेडेंशियल"
+],
+"fill": [
+"Fill in",
+"நிரப்பு",
+"भरें"
+],
+"invalid_login": [
+"Invalid login credentials. Please try again.",
+"தவறான உள்நுழைவு விவரங்கள். மீண்டும் முயற்சிக்கவும்.",
+"लॉगिन विवरण गलत हैं। कृपया फिर से प्रयास करें।"
+],
+"fill_all": [
+"Please fill in all fields.",
+"அனைத்து புலங்களையும் நிரப்பவும்.",
+"कृपया सभी फ़ील्ड भरें।"
+],
+"email_used": [
+"An account with this email already exists.",
+"இந்த மின்னஞ்சலில் ஏற்கனவே கணக்கு உள்ளது.",
+"इस ईमेल से खाता पहले से मौजूद है।"
+],
+"language": [
+"Language",
+"மொழி",
+"भाषा"
+],
+"n_dashboard": [
+"Dashboard",
+"டாஷ்போர்டு",
+"डैशबोर्ड"
+],
+"n_hospitals": [
+"Hospitals",
+"மருத்துவமனைகள்",
+"अस्पताल"
+],
+"n_doctors": [
+"Doctors",
+"மருத்துவர்கள்",
+"डॉक्टर"
+],
+"n_beds": [
+"Bed availability",
+"படுக்கை நிலவரம்",
+"बेड उपलब्धता"
+],
+"n_token": [
+"Get queue token",
+"வரிசை டோக்கன் பெறுக",
+"कतार टोकन लें"
+],
+"n_mytoken": [
+"My token",
+"என் டோக்கன்",
+"मेरा टोकन"
+],
+"n_appts": [
+"Appointments",
+"சந்திப்புகள்",
+"अपॉइंटमेंट"
+],
+"n_ambulance": [
+"Request ambulance",
+"ஆம்புலன்ஸ் கோருக",
+"एम्बुलेंस बुलाएँ"
+],
+"n_sos": [
+"Emergency SOS",
+"அவசர SOS",
+"आपातकालीन SOS"
+],
+"n_meds": [
+"Medicines",
+"மருந்துகள்",
+"दवाइयाँ"
+],
+"n_homecare": [
+"Home care",
+"வீட்டு பராமரிப்பு",
+"होम केयर"
+],
+"n_history": [
+"My history",
+"என் வரலாறு",
+"मेरा इतिहास"
+],
+"n_profile": [
+"Profile",
+"சுயவிவரம்",
+"प्रोफ़ाइल"
+],
+"n_logout": [
+"Log out",
+"வெளியேறு",
+"लॉग आउट"
+],
+"n_queue": [
+"Queue",
+"வரிசை",
+"कतार"
+],
+"n_scanner": [
+"QR scanner",
+"QR ஸ்கேனர்",
+"QR स्कैनर"
+],
+"n_ops": [
+"Operations",
+"செயல்பாடுகள்",
+"संचालन"
+],
+"n_services": [
+"Services",
+"சேவைகள்",
+"सेवाएँ"
+],
+"n_overview": [
+"Overview",
+"மேலோட்டம்",
+"अवलोकन"
+],
+"n_deliveries": [
+"Deliveries",
+"விநியோகங்கள்",
+"डिलीवरी"
+],
+"n_requests": [
+"Requests",
+"கோரிக்கைகள்",
+"अनुरोध"
+],
+"g_care": [
+"Care",
+"பராமரிப்பு",
+"देखभाल"
+],
+"g_urgent": [
+"Urgent",
+"அவசரம்",
+"आपातकाल"
+],
+"g_account": [
+"Account",
+"கணக்கு",
+"खाता"
+],
+"no_results": [
+"No matching results found.",
+"பொருந்தும் முடிவுகள் இல்லை.",
+"कोई मिलता-जुलता परिणाम नहीं मिला।"
+],
+"view": [
+"View details",
+"விவரங்கள்",
+"विवरण देखें"
+],
+"cancel": [
+"Cancel",
+"ரத்து செய்",
+"रद्द करें"
+],
+"save": [
+"Save changes",
+"மாற்றங்களைச் சேமி",
+"बदलाव सहेजें"
+],
+"saved": [
+"Saved.",
+"சேமிக்கப்பட்டது.",
+"सहेज लिया गया।"
+],
+"updated": [
+"Updated.",
+"புதுப்பிக்கப்பட்டது.",
+"अपडेट किया गया।"
+],
+"hospital": [
+"Hospital",
+"மருத்துவமனை",
+"अस्पताल"
+],
+"dept": [
+"Department",
+"துறை",
+"विभाग"
+],
+"departments": [
+"Departments",
+"துறைகள்",
+"विभाग"
+],
+"doctor": [
+"Doctor",
+"மருத்துவர்",
+"डॉक्टर"
+],
+"date": [
+"Date",
+"தேதி",
+"तारीख"
+],
+"time": [
+"Time",
+"நேரம்",
+"समय"
+],
+"status": [
+"Status",
+"நிலை",
+"स्थिति"
+],
+"actions": [
+"Actions",
+"செயல்கள்",
+"कार्रवाई"
+],
+"any_doctor": [
+"Any available doctor",
+"கிடைக்கும் எந்த மருத்துவரும்",
+"कोई भी उपलब्ध डॉक्टर"
+],
+"room": [
+"Room",
+"அறை",
+"कमरा"
+],
+"min": [
+"min",
+"நிமி",
+"मिनट"
+],
+"patient": [
+"Patient",
+"நோயாளி",
+"मरीज़"
+],
+"token": [
+"Token",
+"டோக்கன்",
+"टोकन"
+],
+"total": [
+"Total",
+"மொத்தம்",
+"कुल"
+],
+"address": [
+"Address",
+"முகவரி",
+"पता"
+],
+"notes": [
+"Notes",
+"குறிப்புகள்",
+"टिप्पणियाँ"
+],
+"waiting": [
+"Waiting",
+"காத்திருப்பு",
+"प्रतीक्षा"
+],
+"position": [
+"Queue position",
+"வரிசை இடம்",
+"कतार में स्थान"
+],
+"est_wait": [
+"Estimated wait",
+"மதிப்பிட்ட காத்திருப்பு",
+"अनुमानित प्रतीक्षा"
+],
+"about_min": [
+"about {n} min",
+"சுமார் {n} நிமிடம்",
+"लगभग {n} मिनट"
+],
+"generic_error": [
+"Something went wrong on this page. Please go back and try again.",
+"இந்தப் பக்கத்தில் ஏதோ தவறு நடந்தது. திரும்பிச் சென்று மீண்டும் முயற்சிக்கவும்.",
+"इस पेज पर कुछ गड़बड़ हुई। कृपया वापस जाकर फिर से प्रयास करें।"
+],
+"no_permission": [
+"You don't have permission to access this section.",
+"இந்தப் பகுதியை அணுக உங்களுக்கு அனுமதி இல்லை.",
+"इस अनुभाग तक पहुँचने की आपको अनुमति नहीं है।"
+],
+"token_only_patient": [
+"Token generation is available only for Patient Login. Hospital staff can scan and verify patient tokens.",
+"டோக்கன் உருவாக்கம் நோயாளி உள்நுழைவுக்கு மட்டுமே. மருத்துவமனை பணியாளர்கள் நோயாளி டோக்கன்களை ஸ்கேன் செய்து சரிபார்க்கலாம்.",
+"टोकन बनाना केवल मरीज़ लॉगिन के लिए उपलब्ध है। अस्पताल स्टाफ मरीज़ों के टोकन स्कैन और सत्यापित कर सकता है।"
+],
+"st_Waiting": [
+"Waiting",
+"காத்திருப்பு",
+"प्रतीक्षा में"
+],
+"st_Verified": [
+"Verified",
+"சரிபார்க்கப்பட்டது",
+"सत्यापित"
+],
+"st_In Queue": [
+"In Queue",
+"வரிசையில்",
+"कतार में"
+],
+"st_Called": [
+"Called",
+"அழைக்கப்பட்டது",
+"बुलाया गया"
+],
+"st_Completed": [
+"Completed",
+"முடிந்தது",
+"पूर्ण"
+],
+"st_Cancelled": [
+"Cancelled",
+"ரத்து செய்யப்பட்டது",
+"रद्द"
+],
+"st_Booked": [
+"Booked",
+"முன்பதிவு செய்யப்பட்டது",
+"बुक किया गया"
+],
+"st_Requested": [
+"Requested",
+"கோரப்பட்டது",
+"अनुरोधित"
+],
+"st_Dispatched": [
+"Dispatched",
+"அனுப்பப்பட்டது",
+"भेजा गया"
+],
+"st_Arrived": [
+"Arrived",
+"வந்தடைந்தது",
+"पहुँच गया"
+],
+"st_Order Placed": [
+"Order Placed",
+"ஆர்டர் செய்யப்பட்டது",
+"ऑर्डर दिया गया"
+],
+"st_Preparing": [
+"Preparing",
+"தயாராகிறது",
+"तैयार हो रहा है"
+],
+"st_Packed": [
+"Packed",
+"பேக் செய்யப்பட்டது",
+"पैक हो गया"
+],
+"st_Out for Delivery": [
+"Out for Delivery",
+"விநியோகத்திற்கு புறப்பட்டது",
+"डिलीवरी के लिए निकला"
+],
+"st_Delivered": [
+"Delivered",
+"வழங்கப்பட்டது",
+"डिलीवर हुआ"
+],
+"st_Assigned": [
+"Assigned",
+"நியமிக்கப்பட்டது",
+"असाइन किया गया"
+],
+"st_Open": [
+"Open",
+"திறந்துள்ளது",
+"खुला"
+],
+"st_Acknowledged": [
+"Acknowledged",
+"ஏற்கப்பட்டது",
+"स्वीकार किया गया"
+],
+"st_Resolved": [
+"Resolved",
+"தீர்க்கப்பட்டது",
+"समाधान हुआ"
+],
+"st_Available": [
+"Available",
+"கிடைக்கும்",
+"उपलब्ध"
+],
+"st_Unavailable": [
+"Unavailable",
+"இல்லை",
+"अनुपलब्ध"
+],
+"st_Busy": [
+"Busy",
+"பணியில்",
+"व्यस्त"
+],
+"bed_General": [
+"General",
+"பொது",
+"सामान्य"
+],
+"bed_ICU": [
+"ICU",
+"தீவிர சிகிச்சை",
+"आईसीयू"
+],
+"bed_Emergency": [
+"Emergency",
+"அவசர",
+"आपातकालीन"
+],
+"bed_Pediatric": [
+"Pediatric",
+"குழந்தைகள்",
+"बाल रोग"
+],
+"hello": [
+"Hello, {n}",
+"வணக்கம், {n}",
+"नमस्ते, {n}"
+],
+"home_sub": [
+"Here is what needs your attention today.",
+"இன்று உங்கள் கவனம் தேவைப்படுபவை இங்கே.",
+"आज आपके ध्यान देने योग्य बातें यहाँ हैं।"
+],
+"sos_h": [
+"In an emergency, don't wait in line.",
+"அவசரத்தில் வரிசையில் காத்திருக்க வேண்டாம்.",
+"आपात स्थिति में कतार में इंतज़ार न करें।"
+],
+"sos_p": [
+"Alert a hospital and the ambulance team in one tap.",
+"ஒரே தொடுதலில் மருத்துவமனைக்கும் ஆம்புலன்ஸ் குழுவுக்கும் தெரிவிக்கவும்.",
+"एक टैप में अस्पताल और एम्बुलेंस टीम को सूचित करें।"
+],
+"active_token": [
+"Your active token",
+"உங்கள் செயலில் உள்ள டோக்கன்",
+"आपका सक्रिय टोकन"
+],
+"no_active": [
+"You have no active token.",
+"உங்களிடம் செயலில் உள்ள டோக்கன் இல்லை.",
+"आपके पास कोई सक्रिय टोकन नहीं है।"
+],
+"get_token_cta": [
+"Get a token",
+"டோக்கன் பெறுக",
+"टोकन लें"
+],
+"view_token": [
+"View token",
+"டோக்கனைப் பார்",
+"टोकन देखें"
+],
+"your_turn": [
+"It's your turn. Please go to room {r}.",
+"உங்கள் முறை. அறை {r} க்குச் செல்லவும்.",
+"आपकी बारी है। कृपया कमरा {r} में जाएँ।"
+],
+"next_appt": [
+"Next appointments",
+"அடுத்த சந்திப்புகள்",
+"अगले अपॉइंटमेंट"
+],
+"no_appt": [
+"No appointments yet.",
+"சந்திப்புகள் இல்லை.",
+"अभी कोई अपॉइंटमेंट नहीं।"
+],
+"book_appt": [
+"Book appointment",
+"சந்திப்பை முன்பதிவு செய்",
+"अपॉइंटमेंट बुक करें"
+],
+"quick": [
+"Quick actions",
+"விரைவு செயல்கள்",
+"त्वरित कार्य"
+],
+"hosp_sub": [
+"Find a hospital, check its queue and join before you travel.",
+"மருத்துவமனையைத் தேடி, வரிசையைப் பார்த்து, பயணிக்கும் முன் சேருங்கள்.",
+"अस्पताल खोजें, उसकी कतार देखें और जाने से पहले जुड़ें।"
+],
+"hosp_search": [
+"Search by hospital, area or department",
+"மருத்துவமனை, பகுதி அல்லது துறையால் தேடுங்கள்",
+"अस्पताल, क्षेत्र या विभाग से खोजें"
+],
+"in_queue_n": [
+"{n} in queue",
+"{n} பேர் வரிசையில்",
+"कतार में {n}"
+],
+"beds_free_n": [
+"{n} beds free",
+"{n} படுக்கைகள் காலி",
+"{n} बेड खाली"
+],
+"doc_sub": [
+"See who is available and book a visit.",
+"யார் கிடைக்கிறார்கள் என்று பார்த்து முன்பதிவு செய்யுங்கள்.",
+"देखें कौन उपलब्ध है और विज़िट बुक करें।"
+],
+"doc_search": [
+"Search doctor, department or hospital",
+"மருத்துவர், துறை அல்லது மருத்துவமனை தேடுங்கள்",
+"डॉक्टर, विभाग या अस्पताल खोजें"
+],
+"all_depts": [
+"All departments",
+"அனைத்து துறைகள்",
+"सभी विभाग"
+],
+"book": [
+"Book",
+"முன்பதிவு",
+"बुक करें"
+],
+"beds_sub": [
+"Live bed counts across hospitals.",
+"மருத்துவமனைகளின் நேரடி படுக்கை எண்ணிக்கை.",
+"अस्पतालों में बेड की लाइव संख्या।"
+],
+"token_sub": [
+"Pick a hospital and department. Your token and QR code appear right away.",
+"மருத்துவமனை மற்றும் துறையைத் தேர்ந்தெடுங்கள். உங்கள் டோக்கனும் QR குறியீடும் உடனே தோன்றும்.",
+"अस्पताल और विभाग चुनें। आपका टोकन और QR कोड तुरंत दिखेगा।"
+],
+"generate_token": [
+"Generate token",
+"டோக்கன் உருவாக்கு",
+"टोकन बनाएँ"
+],
+"if_join": [
+"If you join now",
+"இப்போது சேர்ந்தால்",
+"अभी जुड़ने पर"
+],
+"token_created": [
+"Token generated.",
+"டோக்கன் உருவாக்கப்பட்டது.",
+"टोकन बन गया।"
+],
+"token_exists": [
+"You already have an active token for this department.",
+"இந்தத் துறைக்கு உங்களிடம் ஏற்கனவே செயலில் உள்ள டோக்கன் உள்ளது.",
+"इस विभाग के लिए आपके पास पहले से सक्रिय टोकन है।"
+],
+"mytoken_sub": [
+"Show this QR code at the hospital desk.",
+"மருத்துவமனை மேசையில் இந்த QR குறியீட்டைக் காட்டுங்கள்.",
+"अस्पताल के डेस्क पर यह QR कोड दिखाएँ।"
+],
+"cancel_token": [
+"Cancel this token",
+"இந்த டோக்கனை ரத்து செய்",
+"यह टोकन रद्द करें"
+],
+"other_tokens": [
+"Earlier tokens",
+"முந்தைய டோக்கன்கள்",
+"पहले के टोकन"
+],
+"qr_hint": [
+"Hospital staff scan this code to verify you. Keep the screen bright when you arrive.",
+"உங்களைச் சரிபார்க்க மருத்துவமனை பணியாளர்கள் இந்தக் குறியீட்டை ஸ்கேன் செய்வார்கள். வரும்போது திரையை பிரகாசமாக வைத்திருங்கள்.",
+"आपको सत्यापित करने के लिए स्टाफ यह कोड स्कैन करेगा। पहुँचने पर स्क्रीन की चमक ज़्यादा रखें।"
+],
+"qr_offline": [
+"QR image could not load offline. Show this code instead:",
+"QR படம் இணையமின்றி ஏற்றப்படவில்லை. இந்தக் குறியீட்டைக் காட்டுங்கள்:",
+"QR चित्र ऑफ़लाइन लोड नहीं हुआ। यह कोड दिखाएँ:"
+],
+"appt_sub": [
+"Choose a doctor, date and time slot.",
+"மருத்துவர், தேதி மற்றும் நேரத்தைத் தேர்ந்தெடுங்கள்.",
+"डॉक्टर, तारीख और समय चुनें।"
+],
+"no_doctors": [
+"No doctors available",
+"மருத்துவர்கள் இல்லை",
+"कोई डॉक्टर उपलब्ध नहीं"
+],
+"confirm_booking": [
+"Confirm booking",
+"முன்பதிவை உறுதி செய்",
+"बुकिंग की पुष्टि करें"
+],
+"your_appts": [
+"Your appointments",
+"உங்கள் சந்திப்புகள்",
+"आपके अपॉइंटमेंट"
+],
+"booked": [
+"Appointment booked.",
+"சந்திப்பு முன்பதிவு செய்யப்பட்டது.",
+"अपॉइंटमेंट बुक हो गया।"
+],
+"slot_taken": [
+"That slot is already booked for this doctor. Pick another time.",
+"இந்த நேரம் ஏற்கனவே முன்பதிவு செய்யப்பட்டுள்ளது. வேறு நேரத்தைத் தேர்ந்தெடுங்கள்.",
+"यह स्लॉट पहले से बुक है। कोई और समय चुनें।"
+],
+"amb_sub": [
+"Request a vehicle to your pickup point.",
+"உங்கள் இடத்திற்கு வாகனத்தைக் கோருங்கள்.",
+"अपने स्थान पर वाहन का अनुरोध करें।"
+],
+"pickup": [
+"Pickup address",
+"ஏற்றும் முகவரி",
+"पिकअप का पता"
+],
+"amb_type": [
+"Request type",
+"கோரிக்கை வகை",
+"अनुरोध का प्रकार"
+],
+"amb_emergency": [
+"Emergency",
+"அவசரம்",
+"आपातकालीन"
+],
+"amb_transfer": [
+"Patient transfer",
+"நோயாளி மாற்றம்",
+"मरीज़ स्थानांतरण"
+],
+"dest_hospital": [
+"Destination hospital",
+"சேரும் மருத்துவமனை",
+"गंतव्य अस्पताल"
+],
+"request_amb": [
+"Request ambulance",
+"ஆம்புலன்ஸ் கோருக",
+"एम्बुलेंस बुलाएँ"
+],
+"your_requests": [
+"Your requests",
+"உங்கள் கோரிக்கைகள்",
+"आपके अनुरोध"
+],
+"no_amb_req": [
+"No ambulance requests yet.",
+"ஆம்புலன்ஸ் கோரிக்கைகள் இல்லை.",
+"अभी कोई एम्बुलेंस अनुरोध नहीं।"
+],
+"req_sent": [
+"Request sent.",
+"கோரிக்கை அனுப்பப்பட்டது.",
+"अनुरोध भेज दिया गया।"
+],
+"sos_page_sub": [
+"Tell us where you are. The hospital and ambulance team are alerted together.",
+"நீங்கள் எங்கே இருக்கிறீர்கள் என்று சொல்லுங்கள். மருத்துவமனைக்கும் ஆம்புலன்ஸ் குழுவுக்கும் ஒன்றாகத் தெரிவிக்கப்படும்.",
+"बताएँ आप कहाँ हैं। अस्पताल और एम्बुलेंस टीम को साथ में सूचित किया जाएगा।"
+],
+"location": [
+"Your location",
+"உங்கள் இருப்பிடம்",
+"आपका स्थान"
+],
+"location_ph": [
+"Street, landmark or area",
+"தெரு, அடையாளம் அல்லது பகுதி",
+"सड़क, लैंडमार्क या क्षेत्र"
+],
+"location_req": [
+"Enter your location so the team can find you.",
+"குழு உங்களைக் கண்டுபிடிக்க இருப்பிடத்தை உள்ளிடுங்கள்.",
+"टीम आपको ढूँढ सके, इसलिए अपना स्थान दर्ज करें।"
+],
+"what_happened": [
+"What is happening? (optional)",
+"என்ன நடக்கிறது? (விருப்பம்)",
+"क्या हो रहा है? (वैकल्पिक)"
+],
+"sos_disclaimer": [
+"CareQueue is a prototype. In a real emergency, call your local emergency number (108 in India).",
+"CareQueue ஒரு முன்மாதிரி. உண்மையான அவசரத்தில் உங்கள் உள்ளூர் அவசர எண்ணை அழைக்கவும் (இந்தியாவில் 108).",
+"CareQueue एक प्रोटोटाइप है। असली आपात स्थिति में अपने स्थानीय आपातकालीन नंबर पर कॉल करें (भारत में 108)।"
+],
+"sos_sent": [
+"Emergency alert sent to the hospital and ambulance team.",
+"அவசர எச்சரிக்கை மருத்துவமனைக்கும் ஆம்புலன்ஸ் குழுவுக்கும் அனுப்பப்பட்டது.",
+"आपातकालीन अलर्ट अस्पताल और एम्बुलेंस टीम को भेज दिया गया।"
+],
+"sos_after": [
+"Stay where you are and keep your phone nearby. You can follow the ambulance status below.",
+"இருக்கும் இடத்திலேயே இருங்கள், தொலைபேசியை அருகில் வைத்திருங்கள். ஆம்புலன்ஸ் நிலையைக் கீழே பின்தொடரலாம்.",
+"जहाँ हैं वहीं रहें और फ़ोन पास रखें। एम्बुलेंस की स्थिति नीचे देख सकते हैं।"
+],
+"track_amb": [
+"Track ambulance",
+"ஆம்புலன்சைப் பின்தொடர்",
+"एम्बुलेंस ट्रैक करें"
+],
+"shop": [
+"Shop",
+"கடை",
+"दुकान"
+],
+"cart": [
+"Cart",
+"கூடை",
+"कार्ट"
+],
+"orders": [
+"Orders",
+"ஆர்டர்கள்",
+"ऑर्डर"
+],
+"meds_sub": [
+"Order medicines and track delivery to your door.",
+"மருந்துகளை ஆர்டர் செய்து வீட்டு வாசல் வரை கண்காணியுங்கள்.",
+"दवाइयाँ ऑर्डर करें और दरवाज़े तक डिलीवरी ट्रैक करें।"
+],
+"med_search": [
+"Search medicines",
+"மருந்துகளைத் தேடுங்கள்",
+"दवाइयाँ खोजें"
+],
+"rx": [
+"Prescription",
+"மருந்துச் சீட்டு",
+"पर्चा ज़रूरी"
+],
+"rx_note": [
+"Some items need a prescription. Keep it ready for the delivery partner.",
+"சில பொருட்களுக்கு மருந்துச் சீட்டு தேவை. விநியோகஸ்தரிடம் காட்ட தயாராக வைத்திருங்கள்.",
+"कुछ वस्तुओं के लिए पर्चा ज़रूरी है। डिलीवरी पार्टनर के लिए तैयार रखें।"
+],
+"cart_empty": [
+"Your cart is empty.",
+"உங்கள் கூடை காலியாக உள்ளது.",
+"आपका कार्ट खाली है।"
+],
+"browse_meds": [
+"Browse medicines",
+"மருந்துகளைப் பார்",
+"दवाइयाँ देखें"
+],
+"delivery_details": [
+"Delivery details",
+"விநியோக விவரங்கள்",
+"डिलीवरी विवरण"
+],
+"place_order": [
+"Place order",
+"ஆர்டர் செய்",
+"ऑर्डर करें"
+],
+"cod": [
+"Pay on delivery.",
+"விநியோகத்தின் போது பணம் செலுத்தவும்.",
+"डिलीवरी पर भुगतान करें।"
+],
+"no_orders": [
+"No orders yet.",
+"ஆர்டர்கள் இல்லை.",
+"अभी कोई ऑर्डर नहीं।"
+],
+"order_placed": [
+"Order placed.",
+"ஆர்டர் செய்யப்பட்டது.",
+"ऑर्डर दे दिया गया।"
+],
+"hc_sub": [
+"Nurses, therapists and attendants who come to you.",
+"உங்களிடம் வரும் செவிலியர்கள், சிகிச்சையாளர்கள் மற்றும் உதவியாளர்கள்.",
+"नर्स, थेरेपिस्ट और अटेंडेंट जो आपके घर आते हैं।"
+],
+"request": [
+"Request",
+"கோரு",
+"अनुरोध"
+],
+"request_service": [
+"Request service",
+"சேவையைக் கோருக",
+"सेवा का अनुरोध करें"
+],
+"no_requests": [
+"No requests yet.",
+"கோரிக்கைகள் இல்லை.",
+"अभी कोई अनुरोध नहीं।"
+],
+"history_sub": [
+"Everything you have done on CareQueue.",
+"CareQueue இல் நீங்கள் செய்த அனைத்தும்.",
+"CareQueue पर आपकी सारी गतिविधि।"
+],
+"nothing_yet": [
+"Nothing here yet.",
+"இங்கே எதுவும் இல்லை.",
+"यहाँ अभी कुछ नहीं।"
+],
+"ops_sub": [
+"Live operations for today.",
+"இன்றைய நேரடி செயல்பாடுகள்.",
+"आज का लाइव संचालन।"
+],
+"k_patients": [
+"Total patients today",
+"இன்றைய மொத்த நோயாளிகள்",
+"आज के कुल मरीज़"
+],
+"k_appts_today": [
+"Appointments today",
+"இன்றைய சந்திப்புகள்",
+"आज के अपॉइंटमेंट"
+],
+"k_active_queue": [
+"Active queue",
+"செயலில் உள்ள வரிசை",
+"सक्रिय कतार"
+],
+"k_emerg": [
+"Emergency requests",
+"அவசர கோரிக்கைகள்",
+"आपातकालीन अनुरोध"
+],
+"k_beds": [
+"Beds available",
+"கிடைக்கும் படுக்கைகள்",
+"उपलब्ध बेड"
+],
+"k_docs": [
+"Doctors available",
+"கிடைக்கும் மருத்துவர்கள்",
+"उपलब्ध डॉक्टर"
+],
+"k_amb": [
+"Ambulances available",
+"கிடைக்கும் ஆம்புலன்ஸ்",
+"उपलब्ध एम्बुलेंस"
+],
+"dept_queue": [
+"Queue by department",
+"துறை வாரியான வரிசை",
+"विभाग के अनुसार कतार"
+],
+"avg_wait": [
+"Avg. wait",
+"சராசரி காத்திருப்பு",
+"औसत प्रतीक्षा"
+],
+"doc_status": [
+"Doctor status",
+"மருத்துவர் நிலை",
+"डॉक्टर की स्थिति"
+],
+"emerg_h": [
+"Emergency cases",
+"அவசர நிகழ்வுகள்",
+"आपातकालीन मामले"
+],
+"no_emerg": [
+"No emergency requests.",
+"அவசர கோரிக்கைகள் இல்லை.",
+"कोई आपातकालीन अनुरोध नहीं।"
+],
+"acknowledge": [
+"Acknowledge",
+"ஏற்றுக்கொள்",
+"स्वीकार करें"
+],
+"resolve": [
+"Resolve",
+"தீர்",
+"हल करें"
+],
+"queue_sub": [
+"Verify patients, call the next token and keep the line moving.",
+"நோயாளிகளைச் சரிபார்த்து, அடுத்த டோக்கனை அழைத்து வரிசையை நகர்த்துங்கள்.",
+"मरीज़ों को सत्यापित करें, अगला टोकन बुलाएँ और कतार आगे बढ़ाएँ।"
+],
+"call_next": [
+"Call next patient",
+"அடுத்த நோயாளியை அழை",
+"अगले मरीज़ को बुलाएँ"
+],
+"move_forward": [
+"Move queue forward",
+"வரிசையை முன்னகர்த்து",
+"कतार आगे बढ़ाएँ"
+],
+"token_search": [
+"Search token or patient",
+"டோக்கன் அல்லது நோயாளியைத் தேடு",
+"टोकन या मरीज़ खोजें"
+],
+"all_status": [
+"All statuses",
+"அனைத்து நிலைகள்",
+"सभी स्थितियाँ"
+],
+"act_verify": [
+"Verify",
+"சரிபார்",
+"सत्यापित करें"
+],
+"act_queue": [
+"Add to queue",
+"வரிசையில் சேர்",
+"कतार में जोड़ें"
+],
+"act_call": [
+"Call",
+"அழை",
+"बुलाएँ"
+],
+"act_complete": [
+"Complete",
+"முடி",
+"पूर्ण करें"
+],
+"queue_none": [
+"No verified patients are waiting in the queue.",
+"வரிசையில் சரிபார்க்கப்பட்ட நோயாளிகள் யாரும் இல்லை.",
+"कतार में कोई सत्यापित मरीज़ प्रतीक्षा में नहीं है।"
+],
+"now_calling": [
+"Calling {c} to room {r}.",
+"{c} ஐ அறை {r} க்கு அழைக்கிறது.",
+"{c} को कमरा {r} में बुला रहे हैं।"
+],
+"scan_sub": [
+"Scan a patient's QR code or type the token code to verify it.",
+"நோயாளியின் QR குறியீட்டை ஸ்கேன் செய்யுங்கள் அல்லது டோக்கன் குறியீட்டை உள்ளிட்டுச் சரிபாருங்கள்.",
+"मरीज़ का QR कोड स्कैन करें या टोकन कोड लिखकर सत्यापित करें।"
+],
+"scan_camera": [
+"Camera scanner",
+"கேமரா ஸ்கேனர்",
+"कैमरा स्कैनर"
+],
+"camera_off": [
+"Camera is off",
+"கேமரா அணைந்துள்ளது",
+"कैमरा बंद है"
+],
+"start_scan": [
+"Start scanning",
+"ஸ்கேன் தொடங்கு",
+"स्कैन शुरू करें"
+],
+"stop_scan": [
+"Stop scanning",
+"ஸ்கேன் நிறுத்து",
+"स्कैन बंद करें"
+],
+"camera_unavailable": [
+"Camera access is unavailable. You can verify the token manually.",
+"கேமரா அணுகல் இல்லை. டோக்கனை கைமுறையாகச் சரிபார்க்கலாம்.",
+"कैमरा उपलब्ध नहीं है। आप टोकन मैन्युअल रूप से सत्यापित कर सकते हैं।"
+],
+"manual_verify": [
+"Manual verification",
+"கைமுறை சரிபார்ப்பு",
+"मैन्युअल सत्यापन"
+],
+"manual_hint": [
+"Use this when the camera is unavailable.",
+"கேமரா இல்லாதபோது இதைப் பயன்படுத்துங்கள்.",
+"कैमरा उपलब्ध न होने पर इसका उपयोग करें।"
+],
+"verify": [
+"Verify",
+"சரிபார்",
+"सत्यापित करें"
+],
+"awaiting": [
+"Waiting for verification",
+"சரிபார்ப்புக்காகக் காத்திருப்பவை",
+"सत्यापन की प्रतीक्षा में"
+],
+"none_awaiting": [
+"Every token today is verified.",
+"இன்றைய அனைத்து டோக்கன்களும் சரிபார்க்கப்பட்டன.",
+"आज के सभी टोकन सत्यापित हैं।"
+],
+"scan_wait": [
+"Scan a QR code or enter a token code to see the result here.",
+"முடிவை இங்கே காண QR குறியீட்டை ஸ்கேன் செய்யுங்கள் அல்லது டோக்கன் குறியீட்டை உள்ளிடுங்கள்.",
+"परिणाम यहाँ देखने के लिए QR कोड स्कैन करें या टोकन कोड दर्ज करें।"
+],
+"token_not_found": [
+"Token not found. Check the code and try again.",
+"டோக்கன் கிடைக்கவில்லை. குறியீட்டைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.",
+"टोकन नहीं मिला। कोड जाँचकर फिर से प्रयास करें।"
+],
+"token_other_hospital": [
+"This token belongs to another hospital.",
+"இந்த டோக்கன் வேறு மருத்துவமனைக்கு உரியது.",
+"यह टोकन किसी दूसरे अस्पताल का है।"
+],
+"token_old": [
+"This token is not valid for today.",
+"இந்த டோக்கன் இன்றைக்கு செல்லாது.",
+"यह टोकन आज के लिए मान्य नहीं है।"
+],
+"token_closed": [
+"This token is already closed.",
+"இந்த டோக்கன் ஏற்கனவே முடிக்கப்பட்டது.",
+"यह टोकन पहले ही बंद हो चुका है।"
+],
+"token_verified": [
+"Token verified.",
+"டோக்கன் சரிபார்க்கப்பட்டது.",
+"टोकन सत्यापित हुआ।"
+],
+"token_already": [
+"This token was already verified.",
+"இந்த டோக்கன் ஏற்கனவே சரிபார்க்கப்பட்டது.",
+"यह टोकन पहले ही सत्यापित हो चुका है।"
+],
+"mark_avail": [
+"Mark available",
+"கிடைக்கும் என குறி",
+"उपलब्ध करें"
+],
+"mark_unavail": [
+"Mark unavailable",
+"இல்லை என குறி",
+"अनुपलब्ध करें"
+],
+"admin_sub": [
+"Platform-wide view of hospitals, patients and services.",
+"மருத்துவமனைகள், நோயாளிகள் மற்றும் சேவைகளின் தள அளவிலான பார்வை.",
+"अस्पतालों, मरीज़ों और सेवाओं का प्लेटफ़ॉर्म-स्तरीय दृश्य।"
+],
+"reset_demo": [
+"Reset demo data",
+"டெமோ தரவை மீட்டமை",
+"डेमो डेटा रीसेट करें"
+],
+"reset_done": [
+"Demo data restored.",
+"டெமோ தரவு மீட்டமைக்கப்பட்டது.",
+"डेमो डेटा बहाल किया गया।"
+],
+"k_hospitals": [
+"Hospitals",
+"மருத்துவமனைகள்",
+"अस्पताल"
+],
+"k_users": [
+"Patients",
+"நோயாளிகள்",
+"मरीज़"
+],
+"k_tokens": [
+"Tokens today",
+"இன்றைய டோக்கன்கள்",
+"आज के टोकन"
+],
+"k_amb_req": [
+"Ambulance requests",
+"ஆம்புலன்ஸ் கோரிக்கைகள்",
+"एम्बुलेंस अनुरोध"
+],
+"suspend": [
+"Suspend",
+"இடைநிறுத்து",
+"निलंबित करें"
+],
+"activate": [
+"Activate",
+"செயல்படுத்து",
+"सक्रिय करें"
+],
+"services_sub": [
+"Home care requests and medicine orders.",
+"வீட்டு பராமரிப்பு கோரிக்கைகள் மற்றும் மருந்து ஆர்டர்கள்.",
+"होम केयर अनुरोध और दवा ऑर्डर।"
+],
+"assign": [
+"Assign",
+"நியமி",
+"असाइन करें"
+],
+"delivery_sub": [
+"Move each order from packing to the customer's door.",
+"ஒவ்வொரு ஆர்டரையும் பேக்கிங்கிலிருந்து வாடிக்கையாளர் வாசல் வரை கொண்டு செல்லுங்கள்.",
+"हर ऑर्डर को पैकिंग से ग्राहक के दरवाज़े तक पहुँचाएँ।"
+],
+"k_to_prepare": [
+"To prepare",
+"தயாரிக்க வேண்டியவை",
+"तैयार करने हैं"
+],
+"k_on_way": [
+"On the way",
+"வழியில்",
+"रास्ते में"
+],
+"act_prep": [
+"Start preparing",
+"தயாரிக்கத் தொடங்கு",
+"तैयारी शुरू करें"
+],
+"act_pack": [
+"Mark packed",
+"பேக் செய்தது என குறி",
+"पैक हुआ चिह्नित करें"
+],
+"act_out": [
+"Out for delivery",
+"விநியோகத்திற்கு புறப்பட்டது",
+"डिलीवरी के लिए निकला"
+],
+"act_deliver": [
+"Mark delivered",
+"வழங்கப்பட்டது என குறி",
+"डिलीवर हुआ चिह्नित करें"
+],
+"no_open_orders": [
+"No open orders right now.",
+"இப்போது திறந்த ஆர்டர்கள் இல்லை.",
+"अभी कोई खुला ऑर्डर नहीं।"
+],
+"amb_portal_sub": [
+"Emergency requests are listed first.",
+"அவசர கோரிக்கைகள் முதலில் காட்டப்படும்.",
+"आपातकालीन अनुरोध सबसे पहले दिखाए जाते हैं।"
+],
+"fleet": [
+"Fleet",
+"வாகனங்கள்",
+"बेड़ा"
+],
+"act_dispatch": [
+"Dispatch",
+"அனுப்பு",
+"भेजें"
+],
+"act_arrived": [
+"Mark arrived",
+"வந்தடைந்தது என குறி",
+"पहुँचा चिह्नित करें"
+],
+"no_amb_free": [
+"No ambulance is free right now.",
+"இப்போது காலியான ஆம்புலன்ஸ் இல்லை.",
+"अभी कोई एम्बुलेंस खाली नहीं है।"
+]
+};
+const LANG_IDX={en:0,ta:1,hi:2};
+let lang=(()=>{try{return localStorage.getItem(LS_LANG)||'en'}catch(e){return 'en'}})();
+if(!(lang in LANG_IDX))lang='en';
+function t(k,p){const e=L[k];let s=(e&&(e[LANG_IDX[lang]]||e[0]))||k;if(p)for(const a in p)s=s.split('{'+a+'}').join(p[a]);return s}
+const fmtDate=d=>new Date(d+'T00:00').toLocaleDateString({en:'en-IN',ta:'ta-IN',hi:'hi-IN'}[lang],{day:'numeric',month:'short'});
+
+/* ---------- icons & logo ---------- */
+const IC={
+home:'<path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',
+building:'<path d="M3 21V7l9-4 9 4v14M9 21v-6h6v6M12 8v4M10 10h4"/>',
+user:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/>',
+users:'<circle cx="9" cy="8" r="4"/><path d="M2 21v-1a6 6 0 0 1 6-6h2a6 6 0 0 1 6 6v1M17 4a4 4 0 0 1 0 8M22 21v-1a6 6 0 0 0-4-5.6"/>',
+bed:'<path d="M3 18v-8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8M3 14h18M3 18v2M21 18v2M7 12h4"/>',
+ticket:'<path d="M3 9V6a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v3a3 3 0 0 0 0 6v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-3a3 3 0 0 0 0-6zM14 5v2M14 11v2M14 17v2"/>',
+calendar:'<path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"/>',
+truck:'<path d="M2 16V7h11v9M13 10h4l4 3v3h-2M2 16h2M9 16h6"/><circle cx="6.5" cy="17.5" r="2"/><circle cx="17.5" cy="17.5" r="2"/>',
+alert:'<path d="M12 3l10 18H2zM12 10v5M12 18v.01"/>',
+pill:'<path d="M10.5 20.5l-7-7a4.95 4.95 0 0 1 7-7l7 7a4.95 4.95 0 0 1-7 7zM8.5 8.5l7 7"/>',
+heart:'<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>',
+clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+qr:'<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2v2M14 18h2v2h4v-4"/>',
+logout:'<path d="M9 21H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h4M16 17l5-5-5-5M21 12H9"/>',
+search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+cart:'<path d="M3 4h2l2.4 11h10.2L20 7H6"/><circle cx="9" cy="20" r="1"/><circle cx="17" cy="20" r="1"/>',
+check:'<path d="M5 12l5 5L20 7"/>',
+activity:'<path d="M3 12h4l3-8 4 16 3-8h4"/>',
+shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',
+box:'<path d="M3 7l9-4 9 4v10l-9 4-9-4zM3 7l9 4 9-4M12 11v10"/>',
+chev:'<path d="M9 6l6 6-6 6"/>',
+x:'<path d="M6 6l12 12M18 6L6 18"/>',
+menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',
+pin:'<path d="M12 21s7-6 7-11a7 7 0 1 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2"/>',
+lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'};
+const ic=(n,s=18)=>'<svg class="ic" width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(IC[n]||'')+'</svg>';
+const LOGO='<svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#6B3FD9"/><path d="M11.5 6.5h5V12H22v5h-5.5v5.5h-5V17H6v-5h5.5z" fill="#fff"/><circle cx="25" cy="25" r="2.3" fill="#CDBBFF"/></svg>';
+
+/* ---------- demo database ---------- */
+let DB=null;
+function mkToken(db,o){
+  const key=o.hid+'|'+o.dept+'|'+TODAY();
+  db.counters[key]=(db.counters[key]||0)+1;
+  const n=db.counters[key],h=db.hospitals.find(x=>x.id===o.hid),d=h.depts.find(x=>x.n===o.dept),doc=o.doc?h.doctors.find(x=>x.id===o.doc):null;
+  const code=h.id.replace(/\d+$/,'').slice(0,4)+'-'+o.dept.replace(/[^A-Za-z]/g,'').slice(0,3).toUpperCase()+'-'+String(n).padStart(3,'0');
+  const tk={id:uid('t_'),code,seq:n,uid:o.uid,name:o.name,hid:o.hid,dept:o.dept,doctor:doc?doc.name:'',room:doc?doc.room:d.room,date:TODAY(),status:o.status||'Waiting',createdAt:Date.now()+(o.off||0)*60000};
+  db.tokens.push(tk);return tk;
+}
+function seed(){
+  const D=(n,avg,room)=>({n,avg,room});
+  const doc=(id,name,dept,room,available=true)=>({id,name,dept,room,available});
+  const db={counters:{},tokens:[],appts:[],emerg:[],ambReqs:[],orders:[],homecare:[],
+    users:[{id:'u_demo',name:'Ananya R',email:'patient@carequeue.demo',phone:'9876500001',password:'patient123'}],
+    hospitals:[
+      {id:'CITYCARE01',name:'CityCare Multispecialty Hospital',area:'Central District',km:2.4,phone:'+91 44 4000 1100',active:true,
+       beds:{General:{total:60,free:22},ICU:{total:12,free:3},Emergency:{total:10,free:4},Pediatric:{total:14,free:6}},
+       depts:[D('General Medicine',8,'101'),D('Cardiology',12,'204'),D('Pediatrics',9,'110'),D('Orthopedics',10,'215'),D('ENT',7,'118')],
+       doctors:[doc('d1','Dr. Kavitha Raman','General Medicine','101'),doc('d2','Dr. Sanjay Iyer','General Medicine','102',false),doc('d3','Dr. Meera Nair','Cardiology','204'),doc('d4','Dr. Arvind Menon','Cardiology','205'),doc('d5','Dr. Farah Khan','Pediatrics','110'),doc('d6','Dr. Prakash Rao','Orthopedics','215'),doc('d7','Dr. Leena Joseph','ENT','118')]},
+      {id:'MARINA02',name:'Marina Heart & Vascular Institute',area:'Seafront',km:4.1,phone:'+91 44 4000 2200',active:true,
+       beds:{General:{total:30,free:9},ICU:{total:20,free:5},Emergency:{total:8,free:2}},
+       depts:[D('Cardiology',14,'301'),D('General Medicine',9,'105')],
+       doctors:[doc('d8','Dr. Rohit Varma','Cardiology','301'),doc('d9','Dr. Anitha Selvam','Cardiology','302'),doc('d10','Dr. Vivek Shah','General Medicine','105')]},
+      {id:'RIVERSIDE03',name:"Riverside Children's Hospital",area:'Riverside',km:5.6,phone:'+91 44 4000 3300',active:true,
+       beds:{General:{total:24,free:8},Pediatric:{total:40,free:15},Emergency:{total:6,free:3}},
+       depts:[D('Pediatrics',10,'12'),D('ENT',8,'18'),D('General Medicine',8,'02')],
+       doctors:[doc('d11','Dr. Nisha Kapoor','Pediatrics','12'),doc('d12','Dr. Thomas George','Pediatrics','13'),doc('d13','Dr. Uma Devi','ENT','18')]},
+      {id:'HILLVIEW04',name:'Hillview General Hospital',area:'Hillview',km:7.9,phone:'+91 44 4000 4400',active:true,
+       beds:{General:{total:80,free:31},ICU:{total:8,free:2},Emergency:{total:12,free:5}},
+       depts:[D('General Medicine',7,'G1'),D('Orthopedics',11,'G6'),D('ENT',7,'G9')],
+       doctors:[doc('d14','Dr. Ganesh Babu','General Medicine','G1'),doc('d15','Dr. Salma Begum','Orthopedics','G6'),doc('d16','Dr. Harish Chandra','ENT','G9')]}
+    ],
+    ambulances:[{id:'AMB-101',driver:'Suresh K',status:'Available'},{id:'AMB-102',driver:'Imran A',status:'Available'},{id:'AMB-103',driver:'Latha M',status:'Busy'},{id:'AMB-104',driver:'Joseph P',status:'Available'}],
+    meds:[
+      {id:'m1',name:'Paracetamol 500 mg',form:'Tablets, strip of 15',price:28,rx:false},
+      {id:'m2',name:'Cetirizine 10 mg',form:'Tablets, strip of 10',price:32,rx:false},
+      {id:'m3',name:'ORS sachets',form:'Pack of 5',price:45,rx:false},
+      {id:'m4',name:'Vitamin D3 60K IU',form:'Capsules, pack of 4',price:95,rx:false},
+      {id:'m5',name:'Cough syrup',form:'100 ml bottle',price:92,rx:false},
+      {id:'m6',name:'Antiseptic liquid',form:'100 ml bottle',price:78,rx:false},
+      {id:'m7',name:'Adhesive bandages',form:'Pack of 20',price:60,rx:false},
+      {id:'m8',name:'Digital thermometer',form:'Device',price:210,rx:false},
+      {id:'m9',name:'Amoxicillin 500 mg',form:'Capsules, strip of 10',price:118,rx:true},
+      {id:'m10',name:'Pantoprazole 40 mg',form:'Tablets, strip of 15',price:88,rx:true},
+      {id:'m11',name:'Metformin 500 mg',form:'Tablets, strip of 15',price:42,rx:true},
+      {id:'m12',name:'Amlodipine 5 mg',form:'Tablets, strip of 15',price:36,rx:true}],
+    services:[
+      {id:'h1',name:'Nurse visit',desc:'Vitals check, injections and medication support at home.',price:'₹700 per visit'},
+      {id:'h2',name:'Physiotherapy',desc:'One-to-one session with a licensed physiotherapist.',price:'₹900 per session'},
+      {id:'h3',name:'Elder care attendant',desc:'Daily assistance, mobility support and monitoring.',price:'₹1,400 per day'},
+      {id:'h4',name:'Sample collection',desc:'Blood and urine sample pickup, reports shared online.',price:'₹250 per visit'},
+      {id:'h5',name:'Wound dressing',desc:'Clean dressing changes by a trained nurse.',price:'₹450 per visit'},
+      {id:'h6',name:'Post-surgery care',desc:'Recovery support, dressing and medication schedule.',price:'₹1,800 per day'}]};
+  const P=(hid,dept,name,status,off)=>mkToken(db,{hid,dept,uid:'seed',name,status,off});
+  P('CITYCARE01','General Medicine','Karthik S','Completed',-120);
+  P('CITYCARE01','General Medicine','Meena V','Called',-80);
+  P('CITYCARE01','General Medicine','Arun P','In Queue',-60);
+  P('CITYCARE01','General Medicine','Divya L','Verified',-45);
+  P('CITYCARE01','General Medicine','Ravi K','Waiting',-30);
+  P('CITYCARE01','Cardiology','Lakshmi N','In Queue',-70);
+  P('CITYCARE01','Cardiology','Mohan D','Verified',-40);
+  P('CITYCARE01','Cardiology','Sara J','Waiting',-20);
+  P('CITYCARE01','Pediatrics','Aadhya M','Waiting',-25);
+  P('CITYCARE01','Pediatrics','Rohan T','In Queue',-50);
+  P('MARINA02','Cardiology','Vimal C','In Queue',-35);
+  P('MARINA02','General Medicine','Zoya A','Waiting',-15);
+  const now=Date.now();
+  db.emerg.push({id:'e_seed',uid:'seed',name:'Walk-in alert',phone:'9000000000',hid:'CITYCARE01',note:'Chest pain, adult male',location:'Central Bus Stand',status:'Open',createdAt:now-12*60000});
+  db.ambReqs.push({id:'a_seed',uid:'seed',name:'Walk-in alert',phone:'9000000000',pickup:'Central Bus Stand',hid:'CITYCARE01',type:'Emergency',status:'Requested',amb:'',eid:'e_seed',createdAt:now-12*60000});
+  db.orders.push({id:'o_seed',uid:'seed',name:'Kiran M',items:[{id:'m1',name:'Paracetamol 500 mg',price:28,qty:2},{id:'m3',name:'ORS sachets',price:45,qty:1}],total:101,address:'12, Lake View Road',phone:'9000011111',status:'Order Placed',createdAt:now-30*60000});
+  db.homecare.push({id:'hc_seed',uid:'seed',name:'Kiran M',service:'Nurse visit',date:TODAY(),address:'12, Lake View Road',notes:'',status:'Requested',createdAt:now-50*60000});
+  return db;
+}
+function loadDB(){
+  let d=null;try{d=JSON.parse(localStorage.getItem(LS_DB))}catch(e){}
+  if(!d||!d.hospitals){d=seed();DB=d;saveDB()}else DB=d;
+}
+function saveDB(){try{localStorage.setItem(LS_DB,JSON.stringify(DB))}catch(e){}}
+
+/* ---------- data helpers ---------- */
+const ACTIVE=['Waiting','Verified','In Queue'];
+const hosp=id=>DB.hospitals.find(h=>h.id===id);
+const deptOf=(hid,n)=>{const h=hosp(hid);return h&&h.depts.find(d=>d.n===n)};
+const myTokens=()=>DB.tokens.filter(x=>x.uid===S.id).sort((a,b)=>b.createdAt-a.createdAt);
+const hTokens=()=>DB.tokens.filter(x=>x.hid===S.id&&x.date===TODAY());
+const queueLen=(hid,dept)=>DB.tokens.filter(x=>x.hid===hid&&x.date===TODAY()&&ACTIVE.includes(x.status)&&(!dept||x.dept===dept)).length;
+const bedsFree=h=>Object.values(h.beds).reduce((s,b)=>s+b.free,0);
+function position(k){if(!ACTIVE.includes(k.status))return 0;return DB.tokens.filter(x=>x.hid===k.hid&&x.dept===k.dept&&x.date===k.date&&ACTIVE.includes(x.status)&&x.createdAt<k.createdAt).length+1}
+function eta(k){const d=deptOf(k.hid,k.dept);return position(k)*(d?d.avg:8)}
+const qrPayload=k=>JSON.stringify({app:'CareQueue',code:k.code,hid:k.hid,dept:k.dept,date:k.date});
+const BC={'Waiting':'amber','Verified':'blue','In Queue':'violet','Called':'green','Completed':'gray','Cancelled':'red','Booked':'blue','Requested':'amber','Dispatched':'violet','Arrived':'blue','Order Placed':'amber','Preparing':'violet','Packed':'blue','Out for Delivery':'violet','Delivered':'green','Assigned':'blue','Open':'red','Acknowledged':'amber','Resolved':'green','Available':'green','Unavailable':'gray','Busy':'amber'};
+const badge=s=>'<span class="badge '+(BC[s]||'gray')+'">'+esc(t('st_'+s))+'</span>';
+const head=(title,sub,right)=>'<div class="pagehead"><div><h1>'+esc(title)+'</h1>'+(sub?'<p class="sub">'+esc(sub)+'</p>':'')+'</div><div class="btns">'+(right||'')+'</div></div>';
+const empty=(msg,btn)=>'<div class="empty"><p>'+esc(msg)+'</p>'+(btn||'')+'</div>';
+const opts=(arr,sel,fmt)=>arr.map(x=>{const v=Array.isArray(x)?x[0]:x,l=Array.isArray(x)?x[1]:x;return '<option value="'+esc(v)+'"'+(String(v)===String(sel)?' selected':'')+'>'+esc(fmt?fmt(l):l)+'</option>'}).join('');
+
+/* ---------- session & role state ---------- */
+let S=null;
+const ROLE_HOME={patient:'home',hospital:'hospitalPortal',admin:'adminPortal',delivery:'deliveryPortal',ambulance:'ambulancePortal'};
+const getSession=()=>{try{return JSON.parse(sessionStorage.getItem(SS_KEY))}catch(e){return null}};
+const needRole=r=>{if(!S||S.role!==r){toast(t('no_permission'),'error');return false}return true};
+function toast(msg,type){const el=document.createElement('div');el.className='toast '+(type||'ok');el.textContent=msg;$('#toasts').appendChild(el);setTimeout(()=>el.remove(),3800)}
+
+/* ---------- gate (login screens) ---------- */
+let gateMode='login',staffRole='hospital';
+const STAFF={admin:{id:'ADMIN01',pw:'admin123',name:'Platform Admin'},delivery:{id:'DELIVERY01',pw:'admin123',name:'Delivery Partner'},ambulance:{id:'AMBU01',pw:'admin123',name:'Ambulance Dispatch'}};
+function applyGate(){
+  document.querySelectorAll('[data-i18n]').forEach(e=>{e.textContent=t(e.dataset.i18n)});
+  const reg=gateMode==='register';
+  $('#regFields').classList.toggle('hidden',!reg);
+  $('#pTitle').textContent=t(reg?'create_account_h':'patient_login');
+  $('#pSubmit').textContent=t(reg?'register':'login');
+  $('#pSwitch').textContent=t(reg?'to_login':'to_register');
+  $('#demoBtn').classList.toggle('hidden',reg);
+  $('#sTitle').textContent=t('staff_login');
+  $('#sRole').textContent=t('r_'+staffRole);
+  $('#sIdLabel').textContent=t(staffRole==='hospital'?'hospital_id':'staff_id');
+  const cred=staffRole==='hospital'?{id:'CITYCARE01',pw:'admin123'}:STAFF[staffRole];
+  $('#sDemo').textContent=t('demo_creds')+': '+cred.id+' / '+cred.pw;
+  document.querySelectorAll('#roleBtns button').forEach(b=>b.classList.toggle('on',b.dataset.role===staffRole));
+  $('#logoutLink').innerHTML=ic('logout')+' <span>'+esc(t('n_logout'))+'</span>';
+  document.querySelectorAll('.staff-entry .ico').forEach(e=>e.innerHTML=ic('shield',24));
+}
+function gateShow(which){$('#gPatient').classList.toggle('hidden',which!=='patient');$('#gStaff').classList.toggle('hidden',which!=='staff');$('#pErr').textContent='';$('#sErr').textContent=''}
+function setGateMode(m){gateMode=m;$('#pErr').textContent='';applyGate()}
+function openStaffPortal(){staffRole='hospital';$('#sId').value='';$('#sPw').value='';applyGate();gateShow('staff');$('#sId').focus()}
+function backToPatient(){gateShow('patient')}
+function setStaffRole(r){staffRole=r;$('#sErr').textContent='';applyGate()}
+function fillDemoStaff(){const c=staffRole==='hospital'?{id:'CITYCARE01',pw:'admin123'}:STAFF[staffRole];$('#sId').value=c.id;$('#sPw').value=c.pw}
+function startSession(role,id,name){
+  S={loggedIn:true,role,id,name};
+  try{sessionStorage.setItem(SS_KEY,JSON.stringify(S))}catch(e){}
+  unlockApp();go(ROLE_HOME[role]);
+}
+function patientAuth(){
+  loadDB();
+  const email=$('#pEmail').value.trim().toLowerCase(),pw=$('#pPw').value,err=$('#pErr');
+  if(gateMode==='register'){
+    const name=$('#pName').value.trim(),phone=$('#pPhone').value.trim();
+    if(!name||!phone||!email||!pw){err.textContent=t('fill_all');return}
+    if(DB.users.some(u=>u.email===email)){err.textContent=t('email_used');return}
+    const u={id:uid('u_'),name,email,phone,password:pw};DB.users.push(u);saveDB();
+    return startSession('patient',u.id,u.name);
+  }
+  const u=DB.users.find(x=>x.email===email&&x.password===pw);
+  if(!u){err.textContent=t('invalid_login');return}
+  startSession('patient',u.id,u.name);
+}
+function demoPatient(){loadDB();const u=DB.users[0];startSession('patient',u.id,u.name)}
+function staffAuth(){
+  loadDB();
+  const id=$('#sId').value.trim().toUpperCase(),pw=$('#sPw').value,err=$('#sErr');
+  if(!id||!pw){err.textContent=t('fill_all');return}
+  if(staffRole==='hospital'){
+    const h=DB.hospitals.find(x=>x.id===id);
+    if(h&&pw==='admin123')return startSession('hospital',h.id,h.name);
+  }else{
+    const s=STAFF[staffRole];
+    if(s&&id===s.id&&pw===s.pw)return startSession(staffRole,s.id,s.name);
+  }
+  err.textContent=t('invalid_login');
+}
+function unlockApp(){
+  $('#gate').classList.add('hidden');$('#app').classList.remove('hidden');
+  document.body.classList.toggle('staff',S.role!=='patient');
+  $('#userChip').innerHTML=ic('user',16)+' <span>'+esc(S.name)+'</span>';
+  buildNav();
+}
+function lockApp(){
+  $('#app').classList.add('hidden');$('#gate').classList.remove('hidden');
+  document.body.classList.remove('staff');
+  gateMode='login';staffRole='hospital';
+  ['pName','pPhone','pEmail','pPw','sId','sPw'].forEach(i=>{$('#'+i).value=''});
+  gateShow('patient');applyGate();
+}
+function logout(){
+  stopScan();
+  S=null;try{sessionStorage.removeItem(SS_KEY)}catch(e){}
+  med.cart={};current=null;ctx={};lastScan=null;
+  if(location.hash){suppress=true;location.hash=''}
+  toggleMenu(false);lockApp();
+}
+
+/* ---------- navigation & role-based route protection ---------- */
+const NAV={
+ patient:[['g_care',[['home','home','n_dashboard'],['hospitals','building','n_hospitals'],['doctors','user','n_doctors'],['beds','bed','n_beds'],['token','ticket','n_token'],['myToken','qr','n_mytoken'],['appointments','calendar','n_appts']]],['g_urgent',[['ambulanceReq','truck','n_ambulance'],['sos','alert','n_sos']]],['n_services',[['medicines','pill','n_meds'],['homecare','heart','n_homecare']]],['g_account',[['history','clock','n_history'],['profile','user','n_profile']]]],
+ hospital:[[null,[['hospitalPortal','activity','n_dashboard'],['queueMgmt','users','n_queue'],['qrScanner','qr','n_scanner'],['hospOps','building','n_ops']]]],
+ admin:[[null,[['adminPortal','shield','n_overview'],['adminService','box','n_services']]]],
+ delivery:[[null,[['deliveryPortal','box','n_deliveries']]]],
+ ambulance:[[null,[['ambulancePortal','truck','n_requests']]]]};
+function buildNav(){
+  if(!S)return;
+  $('#roleChip').textContent=t('portal_'+S.role);
+  $('#nav').innerHTML=NAV[S.role].map(g=>(g[0]?'<div class="nav-g">'+esc(t(g[0]))+'</div>':'')+g[1].map(i=>'<a data-p="'+i[0]+'" onclick="go(\''+i[0]+'\')">'+ic(i[1])+'<span>'+esc(t(i[2]))+'</span></a>').join('')).join('');
+  $('#menuBtn').innerHTML=ic('menu',24);
+  if(current)setActiveNav((ROUTES[current]||{}).nav||current);
+}
+const setActiveNav=p=>document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.p===p));
+function toggleMenu(open){$('#side').classList.toggle('open',open);$('#scrim').classList.toggle('open',open)}
+
+const ROUTES={
+ home:{r:['patient'],t:'n_dashboard',v:()=>vHome()},
+ hospitals:{r:['patient'],t:'n_hospitals',v:()=>vHospitals()},
+ hospitalDetail:{r:['patient'],t:'n_hospitals',nav:'hospitals',v:()=>vHospitalDetail()},
+ doctors:{r:['patient'],t:'n_doctors',v:()=>vDoctors()},
+ beds:{r:['patient'],t:'n_beds',v:()=>vBeds()},
+ token:{r:['patient'],t:'n_token',v:()=>vToken()},
+ myToken:{r:['patient'],t:'n_mytoken',v:()=>vMyToken(),after:()=>afterMyToken()},
+ appointments:{r:['patient'],t:'n_appts',v:()=>vAppts()},
+ ambulanceReq:{r:['patient'],t:'n_ambulance',v:()=>vAmbReq()},
+ sos:{r:['patient'],t:'n_sos',v:()=>vSOS()},
+ medicines:{r:['patient'],t:'n_meds',v:()=>vMeds()},
+ homecare:{r:['patient'],t:'n_homecare',v:()=>vHomecare()},
+ history:{r:['patient'],t:'n_history',v:()=>vHistory()},
+ profile:{r:['patient'],t:'n_profile',v:()=>vProfile()},
+ hospitalPortal:{r:['hospital'],t:'n_dashboard',v:()=>vHospPortal()},
+ queueMgmt:{r:['hospital'],t:'n_queue',v:()=>vQueue()},
+ qrScanner:{r:['hospital'],t:'n_scanner',v:()=>vScanner()},
+ hospOps:{r:['hospital'],t:'n_ops',v:()=>vHospOps()},
+ adminPortal:{r:['admin'],t:'n_overview',v:()=>vAdmin()},
+ adminService:{r:['admin'],t:'n_services',v:()=>vAdminService()},
+ deliveryPortal:{r:['delivery'],t:'n_deliveries',v:()=>vDelivery()},
+ ambulancePortal:{r:['ambulance'],t:'n_requests',v:()=>vAmbPortal()}
+};
+let current=null,ctx={},suppress=false;
+function go(page,params){
+  if(!S||!S.loggedIn){lockApp();return false}
+  const r=ROUTES[page];
+  if(!r)return go(ROLE_HOME[S.role]);
+  if(!r.r.includes(S.role)){                       /* role check runs on every navigation */
+    const msg=(page==='token'&&S.role==='hospital')?t('token_only_patient'):t('no_permission');
+    toast(msg,'error');
+    return go(ROLE_HOME[S.role],{banner:msg});
+  }
+  stopScan();
+  current=page;ctx=params||{};
+  toggleMenu(false);
+  if(location.hash!=='#/'+page){suppress=true;location.hash='#/'+page}
+  window.scrollTo(0,0);
+  renderCurrent();
+  return true;
+}
+function renderCurrent(){
+  if(!S||!current)return;
+  const r=ROUTES[current];if(!r||!r.r.includes(S.role))return;
+  let html;
+  try{html=r.v()}catch(e){console.error(e);html=empty(t('generic_error'))}
+  $('#main').innerHTML=(ctx.banner?'<div class="alert err" role="alert">'+esc(ctx.banner)+'</div>':'')+html;
+  $('#pageTitle').textContent=t(r.t);
+  setActiveNav(r.nav||current);
+  if(r.after)r.after();
+}
+window.addEventListener('hashchange',()=>{
+  if(suppress){suppress=false;return}
+  const p=location.hash.replace(/^#\/?/,'');
+  if(p&&S&&S.loggedIn)go(p);
+});
+const LIVE=['home','myToken','hospitalPortal','queueMgmt','deliveryPortal','ambulancePortal','adminPortal'];
+function liveTick(){
+  if(!S||!LIVE.includes(current))return;
+  const a=document.activeElement;if(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;
+  loadDB();renderCurrent();
+}
+setInterval(liveTick,5000);
+window.addEventListener('storage',e=>{if(e.key===LS_DB)liveTick()});
+
+function setLang(v){
+  lang=v;try{localStorage.setItem(LS_LANG,v)}catch(e){}
+  document.documentElement.lang=v;
+  ['langGate','langApp'].forEach(i=>{$('#'+i).value=v});
+  applyGate();
+  if(S){buildNav();renderCurrent()}
+}
+
+/* ---------- QR helper ---------- */
+function renderQR(id,text){
+  const el=document.getElementById(id);if(!el)return;el.innerHTML='';
+  try{if(window.QRCode){new QRCode(el,{text,width:176,height:176,colorDark:'#170B33',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});return}}catch(e){}
+  let c='';try{c=JSON.parse(text).code}catch(e){}
+  el.innerHTML='<div class="qrfallback">'+esc(t('qr_offline'))+'<br><strong>'+esc(c)+'</strong></div>';
+}
+
+/* =========================================================
+   PATIENT VIEWS
+   ========================================================= */
+function miniToken(k){
+  const h=hosp(k.hid);
+  const line=k.status==='Called'?t('your_turn',{r:k.room}):t('position')+' '+position(k)+', '+t('about_min',{n:eta(k)});
+  return '<div class="list"><div class="li"><div class="grow"><div class="muted">'+esc(h?h.name:'')+', '+esc(k.dept)+'</div><div style="font-family:var(--fh);font-size:26px;font-weight:700">'+esc(k.code)+'</div><div>'+esc(line)+'</div></div>'+badge(k.status)+'<button class="btn sm" onclick="go(\'myToken\',{id:\''+k.id+'\'})">'+t('view_token')+'</button></div></div>';
+}
+function vHome(){
+  const tk=myTokens().find(x=>ACTIVE.includes(x.status)||x.status==='Called');
+  const ap=DB.appts.filter(a=>a.uid===S.id&&a.status==='Booked'&&a.date>=TODAY()).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).slice(0,3);
+  const quick=[['token','ticket','n_token'],['hospitals','building','n_hospitals'],['appointments','calendar','n_appts'],['ambulanceReq','truck','n_ambulance'],['medicines','pill','n_meds'],['homecare','heart','n_homecare'],['beds','bed','n_beds']];
+  return head(t('hello',{n:S.name}),t('home_sub'))+
+  '<div class="sosbar"><div><strong>'+t('sos_h')+'</strong><span>'+t('sos_p')+'</span></div><button class="btn danger" onclick="go(\'sos\')">'+ic('alert')+' '+t('n_sos')+'</button></div>'+
+  '<div class="cols"><div><h2 class="sh">'+t('active_token')+'</h2>'+
+  (tk?miniToken(tk):empty(t('no_active'),'<div><button class="btn" onclick="go(\'token\')">'+t('get_token_cta')+'</button></div>'))+
+  '<h2 class="sh">'+t('next_appt')+'</h2>'+
+  (ap.length?'<div class="list">'+ap.map(a=>'<div class="li"><div class="grow"><strong>'+esc(a.doctor)+'</strong><div class="muted">'+esc((hosp(a.hid)||{}).name)+', '+esc(a.dept)+'</div></div><div class="right"><strong>'+fmtDate(a.date)+'</strong><div class="muted">'+esc(a.time)+'</div></div></div>').join('')+'</div>':empty(t('no_appt'),'<div><button class="btn ghost" onclick="go(\'appointments\')">'+t('book_appt')+'</button></div>'))+
+  '</div><div><h2 class="sh">'+t('quick')+'</h2><div class="quick">'+quick.map(q=>'<a onclick="go(\''+q[0]+'\')">'+ic(q[1])+'<span>'+t(q[2])+'</span>'+ic('chev',16)+'</a>').join('')+'</div></div></div>';
+}
+
+/* hospitals */
+let hq='';
+function hospitalRows(){
+  const q=hq.trim().toLowerCase();
+  const list=DB.hospitals.filter(h=>h.active&&(!q||(h.name+' '+h.area+' '+h.depts.map(d=>d.n).join(' ')).toLowerCase().includes(q)));
+  if(!list.length)return empty(t('no_results'));
+  return '<div class="list">'+list.map(h=>'<div class="li"><div class="hicon">'+ic('building',22)+'</div><div class="grow"><strong>'+esc(h.name)+'</strong><div class="muted">'+esc(h.area)+', '+h.km+' km</div><div class="chips"><span class="chip">'+t('in_queue_n',{n:queueLen(h.id)})+'</span><span class="chip">'+t('beds_free_n',{n:bedsFree(h)})+'</span></div></div><div class="btns"><button class="btn ghost sm" onclick="go(\'hospitalDetail\',{hid:\''+h.id+'\'})">'+t('view')+'</button><button class="btn sm" onclick="go(\'token\',{hid:\''+h.id+'\'})">'+t('n_token')+'</button></div></div>').join('')+'</div>';
+}
+function vHospitals(){
+  return head(t('n_hospitals'),t('hosp_sub'))+'<div class="searchbox">'+ic('search',16)+'<input type="search" placeholder="'+esc(t('hosp_search'))+'" value="'+esc(hq)+'" oninput="hq=this.value;$(\'#hList\').innerHTML=hospitalRows()"></div><div id="hList">'+hospitalRows()+'</div>';
+}
+function bedBars(h){
+  return Object.entries(h.beds).filter(([,b])=>b.total>0).map(([n,b])=>'<div class="bedrow"><span class="nm">'+esc(t('bed_'+n))+'</span><div class="bar'+(b.free/b.total<.15?' low':'')+'"><i style="width:'+Math.round(b.free/b.total*100)+'%"></i></div><span class="ct">'+b.free+' / '+b.total+'</span></div>').join('');
+}
+function vHospitalDetail(){
+  const h=hosp(ctx.hid);if(!h||!h.active)return empty(t('no_results'));
+  return head(h.name,h.area+', '+h.km+' km, '+h.phone,'<button class="btn ghost" onclick="go(\'appointments\',{hid:\''+h.id+'\'})">'+ic('calendar')+' '+t('book_appt')+'</button><button class="btn" onclick="go(\'token\',{hid:\''+h.id+'\'})">'+ic('ticket')+' '+t('n_token')+'</button>')+
+  '<div class="cols even"><div><h2 class="sh">'+t('departments')+'</h2><div class="list">'+h.depts.map(d=>'<div class="li"><div class="grow"><strong>'+esc(d.n)+'</strong><div class="muted">'+t('room')+' '+esc(d.room)+'</div></div><div class="right"><strong>'+queueLen(h.id,d.n)+'</strong><div class="muted">'+t('waiting')+'</div></div></div>').join('')+'</div>'+
+  '<h2 class="sh">'+t('n_beds')+'</h2><div class="panel">'+bedBars(h)+'</div></div>'+
+  '<div><h2 class="sh">'+t('n_doctors')+'</h2><div class="list">'+h.doctors.map(d=>'<div class="li"><div class="grow"><strong>'+esc(d.name)+'</strong><div class="muted">'+esc(d.dept)+', '+t('room')+' '+esc(d.room)+'</div></div>'+badge(d.available?'Available':'Unavailable')+'</div>').join('')+'</div></div></div>';
+}
+
+/* doctors */
+let dq='',dd='';
+function doctorRows(){
+  const q=dq.trim().toLowerCase(),rows=[];
+  DB.hospitals.filter(h=>h.active).forEach(h=>h.doctors.forEach(d=>{if((!dd||d.dept===dd)&&(!q||(d.name+' '+d.dept+' '+h.name).toLowerCase().includes(q)))rows.push({h,d})}));
+  if(!rows.length)return empty(t('no_results'));
+  return '<div class="list">'+rows.map(({h,d})=>'<div class="li"><div class="hicon">'+ic('user',22)+'</div><div class="grow"><strong>'+esc(d.name)+'</strong><div class="muted">'+esc(d.dept)+', '+esc(h.name)+'</div></div>'+badge(d.available?'Available':'Unavailable')+'<button class="btn sm" '+(d.available?'':'disabled')+' onclick="go(\'appointments\',{hid:\''+h.id+'\',dept:\''+esc(d.dept)+'\',doc:\''+d.id+'\'})">'+t('book')+'</button></div>').join('')+'</div>';
+}
+function vDoctors(){
+  const depts=[...new Set(DB.hospitals.flatMap(h=>h.depts.map(d=>d.n)))].sort();
+  return head(t('n_doctors'),t('doc_sub'))+'<div class="filters"><div class="searchbox">'+ic('search',16)+'<input type="search" placeholder="'+esc(t('doc_search'))+'" value="'+esc(dq)+'" oninput="dq=this.value;$(\'#dList\').innerHTML=doctorRows()"></div><select onchange="dd=this.value;$(\'#dList\').innerHTML=doctorRows()"><option value="">'+t('all_depts')+'</option>'+opts(depts,dd)+'</select></div><div id="dList">'+doctorRows()+'</div>';
+}
+
+/* beds */
+function vBeds(){
+  return head(t('n_beds'),t('beds_sub'))+'<div class="cols even">'+DB.hospitals.filter(h=>h.active).map(h=>'<div class="panel"><h2>'+esc(h.name)+'</h2>'+bedBars(h)+'</div>').join('')+'</div>';
+}
+
+/* token creation (patient only) */
+let tkSel={hid:'',dept:'',doc:''};
+function tokChange(f,v){tkSel[f]=v;if(f==='hid'){tkSel.dept='';tkSel.doc=''}if(f==='dept')tkSel.doc='';renderCurrent()}
+function vToken(){
+  const hs=DB.hospitals.filter(h=>h.active);
+  if(ctx.hid){tkSel={hid:ctx.hid,dept:'',doc:''};ctx.hid=null}
+  if(!tkSel.hid||!hs.some(h=>h.id===tkSel.hid))tkSel={hid:hs[0].id,dept:'',doc:''};
+  const h=hosp(tkSel.hid);
+  if(!h.depts.some(d=>d.n===tkSel.dept))tkSel.dept=h.depts[0].n;
+  const d=deptOf(h.id,tkSel.dept),docs=h.doctors.filter(x=>x.dept===tkSel.dept&&x.available);
+  if(!docs.some(x=>x.id===tkSel.doc))tkSel.doc='';
+  const n=queueLen(h.id,d.n);
+  return head(t('n_token'),t('token_sub'))+'<div class="cols"><div class="panel"><div class="f">'+
+   '<label>'+t('hospital')+'<select onchange="tokChange(\'hid\',this.value)">'+opts(hs.map(x=>[x.id,x.name]),h.id)+'</select></label>'+
+   '<label>'+t('dept')+'<select onchange="tokChange(\'dept\',this.value)">'+opts(h.depts.map(x=>x.n),d.n)+'</select></label>'+
+   '<label>'+t('doctor')+'<select onchange="tokChange(\'doc\',this.value)"><option value="">'+t('any_doctor')+'</option>'+opts(docs.map(x=>[x.id,x.name]),tkSel.doc)+'</select></label>'+
+   '<button class="btn" onclick="createToken()">'+ic('ticket')+' '+t('generate_token')+'</button></div></div>'+
+   '<div class="panel"><h2>'+t('if_join')+'</h2><dl class="kv"><dt>'+t('position')+'</dt><dd>'+(n+1)+'</dd><dt>'+t('est_wait')+'</dt><dd>'+t('about_min',{n:(n+1)*d.avg})+'</dd><dt>'+t('room')+'</dt><dd>'+esc(d.room)+'</dd></dl></div></div>';
+}
+function createToken(){
+  if(!S||S.role!=='patient'){toast(t('token_only_patient'),'error');return}   /* server-style guard inside the action too */
+  loadDB();
+  const h=hosp(tkSel.hid);if(!h||!h.active||!tkSel.dept)return;
+  const ex=DB.tokens.find(x=>x.uid===S.id&&x.hid===h.id&&x.dept===tkSel.dept&&x.date===TODAY()&&ACTIVE.includes(x.status));
+  if(ex){toast(t('token_exists'),'warn');go('myToken',{id:ex.id});return}
+  const k=mkToken(DB,{hid:h.id,dept:tkSel.dept,doc:tkSel.doc,uid:S.id,name:S.name,status:'Waiting'});
+  saveDB();toast(t('token_created'));go('myToken',{id:k.id});
+}
+function ticketHTML(k){
+  const h=hosp(k.hid),called=k.status==='Called';
+  const line=called?t('your_turn',{r:k.room}):ACTIVE.includes(k.status)?t('position')+' '+position(k)+', '+t('about_min',{n:eta(k)}):t('st_'+k.status);
+  return '<div class="ticket"><div class="tk-top"><div class="tk-hosp">'+esc(h?h.name:'')+'</div><div class="tk-code">'+esc(k.code)+'</div>'+badge(k.status)+'<p class="tk-line">'+esc(line)+'</p></div><div class="perf"></div><div class="tk-bot"><div id="qrBox" class="qrbox"></div><dl class="kv"><dt>'+t('patient')+'</dt><dd>'+esc(k.name)+'</dd><dt>'+t('hospital')+'</dt><dd>'+esc(h?h.name:'')+'</dd><dt>'+t('dept')+'</dt><dd>'+esc(k.dept)+'</dd><dt>'+t('doctor')+'</dt><dd>'+esc(k.doctor||t('any_doctor'))+'</dd><dt>'+t('date')+'</dt><dd>'+fmtDate(k.date)+'</dd><dt>'+t('status')+'</dt><dd>'+esc(t('st_'+k.status))+'</dd>'+(ACTIVE.includes(k.status)?'<dt>'+t('est_wait')+'</dt><dd>'+t('about_min',{n:eta(k)})+'</dd>':'')+'</dl></div></div>';
+}
+function vMyToken(){
+  const all=myTokens();
+  if(!all.length)return head(t('n_mytoken'))+empty(t('no_active'),'<div><button class="btn" onclick="go(\'token\')">'+t('get_token_cta')+'</button></div>');
+  const sel=(ctx.id&&all.find(x=>x.id===ctx.id))||all.find(x=>ACTIVE.includes(x.status)||x.status==='Called')||all[0];
+  ctx.sel=sel.id;
+  const others=all.filter(x=>x.id!==sel.id).slice(0,6);
+  return head(t('n_mytoken'),t('mytoken_sub'))+'<div class="cols"><div>'+ticketHTML(sel)+
+   (ACTIVE.includes(sel.status)?'<div class="btns mt"><button class="btn ghost" onclick="cancelMyToken(\''+sel.id+'\')">'+t('cancel_token')+'</button></div>':'')+'</div><div>'+
+   (others.length?'<h2 class="sh">'+t('other_tokens')+'</h2><div class="list">'+others.map(x=>'<div class="li"><div class="grow"><strong>'+esc(x.code)+'</strong><div class="muted">'+esc(x.dept)+', '+fmtDate(x.date)+'</div></div>'+badge(x.status)+'<button class="btn ghost sm" onclick="go(\'myToken\',{id:\''+x.id+'\'})">'+t('view')+'</button></div>').join('')+'</div>':'')+
+   '<div class="alert info mt">'+t('qr_hint')+'</div></div></div>';
+}
+function afterMyToken(){const k=DB.tokens.find(x=>x.id===ctx.sel);if(k)renderQR('qrBox',qrPayload(k))}
+function cancelMyToken(id){
+  if(!needRole('patient'))return;loadDB();
+  const k=DB.tokens.find(x=>x.id===id&&x.uid===S.id);
+  if(!k||!ACTIVE.includes(k.status))return;
+  k.status='Cancelled';saveDB();toast(t('updated'));renderCurrent();
+}
+
+/* appointments */
+const SLOTS=['09:00','09:30','10:00','10:30','11:00','11:30','14:00','14:30','15:00','15:30','16:00'];
+let ap={hid:'',dept:'',doc:'',date:'',time:'09:00'};
+function apChange(f,v){ap[f]=v;if(f==='hid'){ap.dept='';ap.doc=''}if(f==='dept')ap.doc='';renderCurrent()}
+function vAppts(){
+  const hs=DB.hospitals.filter(h=>h.active);
+  if(ctx.hid){ap.hid=ctx.hid;ap.dept=ctx.dept||'';ap.doc=ctx.doc||'';ctx.hid=null}
+  if(!ap.hid||!hs.some(h=>h.id===ap.hid))ap={hid:hs[0].id,dept:'',doc:'',date:ap.date,time:ap.time};
+  const h=hosp(ap.hid);if(!h.depts.some(d=>d.n===ap.dept))ap.dept=h.depts[0].n;
+  const docs=h.doctors.filter(d=>d.dept===ap.dept&&d.available);
+  if(!docs.some(d=>d.id===ap.doc))ap.doc=docs[0]?docs[0].id:'';
+  if(!ap.date)ap.date=TODAY();
+  const mine=DB.appts.filter(a=>a.uid===S.id).sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time));
+  return head(t('n_appts'),t('appt_sub'))+'<div class="cols"><div><div class="panel"><h2>'+t('book_appt')+'</h2><div class="f">'+
+   '<label>'+t('hospital')+'<select onchange="apChange(\'hid\',this.value)">'+opts(hs.map(x=>[x.id,x.name]),h.id)+'</select></label>'+
+   '<label>'+t('dept')+'<select onchange="apChange(\'dept\',this.value)">'+opts(h.depts.map(x=>x.n),ap.dept)+'</select></label>'+
+   '<label>'+t('doctor')+'<select onchange="ap.doc=this.value">'+(docs.length?opts(docs.map(x=>[x.id,x.name]),ap.doc):'<option value="">'+t('no_doctors')+'</option>')+'</select></label>'+
+   '<div class="inline"><label style="flex:1">'+t('date')+'<input type="date" min="'+TODAY()+'" value="'+ap.date+'" onchange="ap.date=this.value"></label><label style="flex:1">'+t('time')+'<select onchange="ap.time=this.value">'+opts(SLOTS,ap.time)+'</select></label></div>'+
+   '<button class="btn" onclick="bookAppt()" '+(docs.length?'':'disabled')+'>'+t('confirm_booking')+'</button></div></div></div>'+
+   '<div><h2 class="sh">'+t('your_appts')+'</h2>'+(mine.length?'<div class="list">'+mine.map(a=>'<div class="li"><div class="grow"><strong>'+esc(a.doctor)+'</strong><div class="muted">'+esc((hosp(a.hid)||{}).name)+', '+esc(a.dept)+'</div><div class="muted">'+fmtDate(a.date)+', '+esc(a.time)+'</div></div>'+badge(a.status)+(a.status==='Booked'?'<button class="btn ghost sm" onclick="cancelAppt(\''+a.id+'\')">'+t('cancel')+'</button>':'')+'</div>').join('')+'</div>':empty(t('no_appt')))+'</div></div>';
+}
+function bookAppt(){
+  if(!needRole('patient'))return;loadDB();
+  const h=hosp(ap.hid),d=h&&h.doctors.find(x=>x.id===ap.doc);
+  if(!d||!ap.date||ap.date<TODAY())return toast(t('fill_all'),'warn');
+  if(DB.appts.some(a=>a.hid===h.id&&a.doc===d.id&&a.date===ap.date&&a.time===ap.time&&a.status==='Booked'))return toast(t('slot_taken'),'warn');
+  DB.appts.push({id:uid('ap_'),uid:S.id,name:S.name,hid:h.id,dept:ap.dept,doc:d.id,doctor:d.name,date:ap.date,time:ap.time,status:'Booked',createdAt:Date.now()});
+  saveDB();toast(t('booked'));renderCurrent();
+}
+function cancelAppt(id){if(!needRole('patient'))return;loadDB();const a=DB.appts.find(x=>x.id===id&&x.uid===S.id);if(a){a.status='Cancelled';saveDB();renderCurrent()}}
+
+/* ambulance & SOS (patient side) */
+const meUser=()=>DB.users.find(u=>u.id===S.id)||{};
+function ambList(){
+  const mine=DB.ambReqs.filter(a=>a.uid===S.id).sort((a,b)=>b.createdAt-a.createdAt);
+  if(!mine.length)return empty(t('no_amb_req'));
+  return '<div class="list">'+mine.map(a=>'<div class="li"><div class="grow"><strong>'+esc(t(a.type==='Emergency'?'amb_emergency':'amb_transfer'))+'</strong><div class="muted">'+esc(a.pickup)+'</div>'+(a.amb?'<div class="muted">'+esc(a.amb)+'</div>':'')+'</div>'+badge(a.status)+'</div>').join('')+'</div>';
+}
+function vAmbReq(){
+  const hs=DB.hospitals.filter(h=>h.active);
+  return head(t('n_ambulance'),t('amb_sub'))+'<div class="cols"><div class="panel"><div class="f">'+
+   '<label>'+t('pickup')+'<textarea id="ambPickup"></textarea></label>'+
+   '<label>'+t('phone')+'<input id="ambPhone" inputmode="tel" value="'+esc(meUser().phone||'')+'"></label>'+
+   '<label>'+t('amb_type')+'<select id="ambType"><option value="Emergency">'+t('amb_emergency')+'</option><option value="Transfer">'+t('amb_transfer')+'</option></select></label>'+
+   '<label>'+t('dest_hospital')+'<select id="ambHosp">'+opts(hs.map(x=>[x.id,x.name]),hs[0].id)+'</select></label>'+
+   '<button class="btn" onclick="requestAmbulance()">'+ic('truck')+' '+t('request_amb')+'</button></div></div>'+
+   '<div><h2 class="sh">'+t('your_requests')+'</h2><div id="ambList">'+ambList()+'</div></div></div>';
+}
+function requestAmbulance(){
+  if(!needRole('patient'))return;loadDB();
+  const pickup=$('#ambPickup').value.trim(),phone=$('#ambPhone').value.trim();
+  if(!pickup||!phone)return toast(t('fill_all'),'warn');
+  DB.ambReqs.push({id:uid('a_'),uid:S.id,name:S.name,phone,pickup,hid:$('#ambHosp').value,type:$('#ambType').value,status:'Requested',amb:'',createdAt:Date.now()});
+  saveDB();toast(t('req_sent'));renderCurrent();
+}
+let sosSent=false;
+function vSOS(){
+  const hs=DB.hospitals.filter(h=>h.active);
+  if(sosSent)return head(t('n_sos'))+'<div class="alert ok">'+t('sos_sent')+'</div><div class="panel"><p>'+t('sos_after')+'</p><div class="btns mt"><button class="btn" onclick="sosSent=false;go(\'ambulanceReq\')">'+t('track_amb')+'</button><button class="btn ghost" onclick="sosSent=false;go(\'home\')">'+t('n_dashboard')+'</button></div></div>';
+  return head(t('n_sos'),t('sos_page_sub'))+'<div class="panel" style="max-width:520px"><button class="sosbtn" onclick="sendSOS()" aria-label="SOS">SOS</button><div class="f">'+
+   '<label>'+t('location')+'<input id="sosLoc" placeholder="'+esc(t('location_ph'))+'"></label>'+
+   '<label>'+t('dest_hospital')+'<select id="sosHosp">'+opts(hs.map(x=>[x.id,x.name]),hs[0].id)+'</select></label>'+
+   '<label>'+t('what_happened')+'<textarea id="sosNote"></textarea></label></div>'+
+   '<p class="muted mt">'+t('sos_disclaimer')+'</p></div>';
+}
+function sendSOS(){
+  if(!needRole('patient'))return;loadDB();
+  const loc=$('#sosLoc').value.trim();if(!loc)return toast(t('location_req'),'warn');
+  const hid=$('#sosHosp').value,note=$('#sosNote').value.trim(),phone=meUser().phone||'',eid=uid('e_');
+  DB.emerg.push({id:eid,uid:S.id,name:S.name,phone,hid,note,location:loc,status:'Open',createdAt:Date.now()});
+  DB.ambReqs.push({id:uid('a_'),uid:S.id,name:S.name,phone,pickup:loc,hid,type:'Emergency',status:'Requested',amb:'',eid,createdAt:Date.now()});
+  saveDB();sosSent=true;renderCurrent();
+}
+
+/* medicines */
+const ORDER_FLOW=['Order Placed','Preparing','Packed','Out for Delivery','Delivered'];
+let med={tab:'shop',q:'',cart:{}};
+const cartCount=()=>Object.values(med.cart).reduce((s,n)=>s+n,0);
+const cartTotal=()=>Object.entries(med.cart).reduce((s,[id,n])=>{const m=DB.meds.find(x=>x.id===id);return s+(m?m.price*n:0)},0);
+function cartAdd(id,d){const n=Math.max(0,(med.cart[id]||0)+d);if(n)med.cart[id]=n;else delete med.cart[id];renderCurrent()}
+function medRows(){
+  const q=med.q.trim().toLowerCase(),list=DB.meds.filter(m=>!q||m.name.toLowerCase().includes(q));
+  if(!list.length)return empty(t('no_results'));
+  return '<div class="list">'+list.map(m=>'<div class="li"><div class="grow"><strong>'+esc(m.name)+'</strong> '+(m.rx?'<span class="badge amber">'+t('rx')+'</span>':'')+'<div class="muted">'+esc(m.form)+'</div></div><div class="price">₹'+m.price+'</div><div class="stepper"><button onclick="cartAdd(\''+m.id+'\',-1)" aria-label="-">−</button><span>'+(med.cart[m.id]||0)+'</span><button onclick="cartAdd(\''+m.id+'\',1)" aria-label="+">+</button></div></div>').join('')+'</div>';
+}
+function orderCard(o){
+  const i=ORDER_FLOW.indexOf(o.status);
+  return '<div class="order"><div class="btns" style="justify-content:space-between;align-items:center"><strong>#'+esc(o.id.slice(-5).toUpperCase())+'</strong>'+badge(o.status)+'</div><div class="muted">'+o.items.map(x=>esc(x.name)+' x'+x.qty).join(', ')+'</div><div class="muted">'+t('total')+': ₹'+o.total+'</div><div class="steps" aria-hidden="true">'+ORDER_FLOW.map((s,j)=>'<i class="'+(j<=i?'done':'')+'"></i>').join('')+'</div></div>';
+}
+function vMeds(){
+  const tabs=[['shop',t('shop')],['cart',t('cart')+' ('+cartCount()+')'],['orders',t('orders')]];
+  let body='';
+  if(med.tab==='shop')body='<div class="searchbox">'+ic('search',16)+'<input type="search" placeholder="'+esc(t('med_search'))+'" value="'+esc(med.q)+'" oninput="med.q=this.value;$(\'#medList\').innerHTML=medRows()"></div><div id="medList">'+medRows()+'</div>';
+  if(med.tab==='cart'){
+    const items=Object.entries(med.cart).map(([id,n])=>({m:DB.meds.find(x=>x.id===id),n})).filter(x=>x.m);
+    body=!items.length?empty(t('cart_empty'),'<div><button class="btn" onclick="med.tab=\'shop\';renderCurrent()">'+t('browse_meds')+'</button></div>'):
+     '<div class="cols"><div class="list">'+items.map(({m,n})=>'<div class="li"><div class="grow"><strong>'+esc(m.name)+'</strong><div class="muted">'+esc(m.form)+'</div></div><div class="price">₹'+m.price*n+'</div><div class="stepper"><button onclick="cartAdd(\''+m.id+'\',-1)">−</button><span>'+n+'</span><button onclick="cartAdd(\''+m.id+'\',1)">+</button></div></div>').join('')+
+     '<div class="li"><div class="grow"><strong>'+t('total')+'</strong></div><div class="price">₹'+cartTotal()+'</div></div></div>'+
+     '<div class="panel"><h2>'+t('delivery_details')+'</h2><div class="f"><label>'+t('address')+'<textarea id="medAddr"></textarea></label><label>'+t('phone')+'<input id="medPhone" inputmode="tel" value="'+esc(meUser().phone||'')+'"></label>'+(items.some(x=>x.m.rx)?'<div class="alert info">'+t('rx_note')+'</div>':'')+'<button class="btn" onclick="placeOrder()">'+ic('cart')+' '+t('place_order')+'</button><p class="muted">'+t('cod')+'</p></div></div></div>';
+  }
+  if(med.tab==='orders'){
+    const mine=DB.orders.filter(o=>o.uid===S.id).sort((a,b)=>b.createdAt-a.createdAt);
+    body=mine.length?'<div class="list" style="padding-top:2px;padding-bottom:2px">'+mine.map(orderCard).join('')+'</div>':empty(t('no_orders'));
+  }
+  return head(t('n_meds'),t('meds_sub'))+'<div class="tabs">'+tabs.map(x=>'<button class="'+(med.tab===x[0]?'on':'')+'" onclick="med.tab=\''+x[0]+'\';renderCurrent()">'+esc(x[1])+'</button>').join('')+'</div>'+body;
+}
+function placeOrder(){
+  if(!needRole('patient'))return;loadDB();
+  const addr=$('#medAddr').value.trim(),phone=$('#medPhone').value.trim();
+  if(!addr||!phone)return toast(t('fill_all'),'warn');
+  const items=Object.entries(med.cart).map(([id,qty])=>{const m=DB.meds.find(x=>x.id===id);return m&&{id,name:m.name,price:m.price,qty}}).filter(Boolean);
+  if(!items.length)return toast(t('cart_empty'),'warn');
+  DB.orders.push({id:uid('o_'),uid:S.id,name:S.name,items,total:items.reduce((s,x)=>s+x.price*x.qty,0),address:addr,phone,status:'Order Placed',createdAt:Date.now()});
+  saveDB();med.cart={};med.tab='orders';toast(t('order_placed'));renderCurrent();
+}
+
+/* home care */
+let hcSel='';
+function vHomecare(){
+  const mine=DB.homecare.filter(h=>h.uid===S.id).sort((a,b)=>b.createdAt-a.createdAt);
+  const svc=DB.services.find(s=>s.id===hcSel);
+  return head(t('n_homecare'),t('hc_sub'))+'<div class="cols"><div><div class="list">'+DB.services.map(s=>'<div class="li"><div class="hicon">'+ic('heart',22)+'</div><div class="grow"><strong>'+esc(s.name)+'</strong><div class="muted">'+esc(s.desc)+'</div><div class="chips"><span class="chip">'+esc(s.price)+'</span></div></div><button class="btn sm '+(hcSel===s.id?'':'ghost')+'" onclick="hcSel=\''+s.id+'\';renderCurrent()">'+t('request')+'</button></div>').join('')+'</div></div><div>'+
+  (svc?'<div class="panel"><h2>'+esc(svc.name)+'</h2><div class="f"><label>'+t('date')+'<input type="date" id="hcDate" min="'+TODAY()+'" value="'+TODAY()+'"></label><label>'+t('address')+'<textarea id="hcAddr"></textarea></label><label>'+t('notes')+'<textarea id="hcNotes"></textarea></label><button class="btn" onclick="requestHome()">'+t('request_service')+'</button></div></div>':'')+
+  '<h2 class="sh">'+t('your_requests')+'</h2>'+(mine.length?'<div class="list">'+mine.map(h=>'<div class="li"><div class="grow"><strong>'+esc(h.service)+'</strong><div class="muted">'+fmtDate(h.date)+'</div></div>'+badge(h.status)+'</div>').join('')+'</div>':empty(t('no_requests')))+'</div></div>';
+}
+function requestHome(){
+  if(!needRole('patient'))return;loadDB();
+  const svc=DB.services.find(s=>s.id===hcSel),date=$('#hcDate').value,addr=$('#hcAddr').value.trim();
+  if(!svc||!date||!addr)return toast(t('fill_all'),'warn');
+  DB.homecare.push({id:uid('hc_'),uid:S.id,name:S.name,service:svc.name,date,address:addr,notes:$('#hcNotes').value.trim(),status:'Requested',createdAt:Date.now()});
+  saveDB();hcSel='';toast(t('req_sent'));renderCurrent();
+}
+
+/* history & profile */
+function vHistory(){
+  const sec=(title,rows)=>'<h2 class="sh">'+t(title)+'</h2>'+(rows.length?'<div class="list">'+rows.join('')+'</div>':empty(t('nothing_yet')));
+  const li=(a,b,s)=>'<div class="li"><div class="grow"><strong>'+esc(a)+'</strong><div class="muted">'+esc(b)+'</div></div>'+badge(s)+'</div>';
+  return head(t('n_history'),t('history_sub'))+
+   sec('n_mytoken',myTokens().map(k=>li(k.code,(hosp(k.hid)||{}).name+', '+fmtDate(k.date),k.status)))+
+   sec('n_appts',DB.appts.filter(a=>a.uid===S.id).map(a=>li(a.doctor,fmtDate(a.date)+', '+a.time,a.status)))+
+   sec('n_meds',DB.orders.filter(o=>o.uid===S.id).map(o=>li('#'+o.id.slice(-5).toUpperCase()+', ₹'+o.total,fmtDate(new Date(o.createdAt).toISOString().slice(0,10)),o.status)))+
+   sec('n_ambulance',DB.ambReqs.filter(a=>a.uid===S.id).map(a=>li(t(a.type==='Emergency'?'amb_emergency':'amb_transfer'),a.pickup,a.status)))+
+   sec('n_homecare',DB.homecare.filter(h=>h.uid===S.id).map(h=>li(h.service,fmtDate(h.date),h.status)));
+}
+function vProfile(){
+  const u=meUser();
+  return head(t('n_profile'))+'<div class="panel" style="max-width:480px"><div class="f"><label>'+t('fullname')+'<input id="prName" value="'+esc(u.name)+'"></label><label>'+t('email')+'<input value="'+esc(u.email)+'" disabled></label><label>'+t('phone')+'<input id="prPhone" value="'+esc(u.phone)+'"></label><label>'+t('language')+'<select onchange="setLang(this.value)"><option value="en"'+(lang==='en'?' selected':'')+'>English</option><option value="ta"'+(lang==='ta'?' selected':'')+'>தமிழ்</option><option value="hi"'+(lang==='hi'?' selected':'')+'>हिन्दी</option></select></label><button class="btn" onclick="saveProfile()">'+t('save')+'</button></div></div>';
+}
+function saveProfile(){
+  if(!needRole('patient'))return;loadDB();
+  const u=DB.users.find(x=>x.id===S.id);if(!u)return;
+  const n=$('#prName').value.trim();if(!n)return toast(t('fill_all'),'warn');
+  u.name=n;u.phone=$('#prPhone').value.trim();S.name=n;
+  try{sessionStorage.setItem(SS_KEY,JSON.stringify(S))}catch(e){}
+  saveDB();$('#userChip').innerHTML=ic('user',16)+' <span>'+esc(S.name)+'</span>';toast(t('saved'));
+}
+
+/* =========================================================
+   HOSPITAL PORTAL (staff only)
+   ========================================================= */
+const myH=()=>hosp(S.id);
+const stat=(v,k,i,cls)=>'<div class="stat '+(cls||'')+'"><b>'+v+'</b><span>'+ic(i,15)+' '+t(k)+'</span></div>';
+function vHospPortal(){
+  const h=myH(),tks=hTokens(),act=tks.filter(x=>ACTIVE.includes(x.status)).length;
+  const em=DB.emerg.filter(e=>e.hid===S.id&&e.status!=='Resolved');
+  const apT=DB.appts.filter(a=>a.hid===S.id&&a.date===TODAY()&&a.status==='Booked').length;
+  const amb=DB.ambulances.filter(a=>a.status==='Available').length;
+  return head(h.name,t('ops_sub'),'<button class="btn ghost" onclick="go(\'queueMgmt\')">'+ic('users')+' '+t('n_queue')+'</button><button class="btn" onclick="go(\'qrScanner\')">'+ic('qr')+' '+t('n_scanner')+'</button>')+
+  '<div class="stats">'+stat(tks.length,'k_patients','users')+stat(apT,'k_appts_today','calendar')+stat(act,'k_active_queue','ticket')+stat(em.length,'k_emerg','alert',em.length?'alertish':'')+stat(bedsFree(h),'k_beds','bed')+stat(h.doctors.filter(d=>d.available).length+'/'+h.doctors.length,'k_docs','user')+stat(amb,'k_amb','truck')+'</div>'+
+  '<div class="cols"><div><div class="panel"><h2>'+t('dept_queue')+'</h2><div class="tw"><table class="tbl"><thead><tr><th>'+t('dept')+'</th><th>'+t('waiting')+'</th><th>'+t('st_Called')+'</th><th>'+t('st_Completed')+'</th><th>'+t('avg_wait')+'</th></tr></thead><tbody>'+
+  h.depts.map(d=>{const x=tks.filter(k=>k.dept===d.n);return '<tr><td><strong>'+esc(d.n)+'</strong></td><td>'+x.filter(k=>ACTIVE.includes(k.status)).length+'</td><td>'+x.filter(k=>k.status==='Called').length+'</td><td>'+x.filter(k=>k.status==='Completed').length+'</td><td>'+d.avg+' '+t('min')+'</td></tr>'}).join('')+'</tbody></table></div></div>'+
+  '<div class="panel"><h2>'+t('doc_status')+'</h2>'+h.doctors.map(d=>'<div class="bedrow"><span class="grow"><strong>'+esc(d.name)+'</strong> <span class="muted">'+esc(d.dept)+'</span></span>'+badge(d.available?'Available':'Unavailable')+'</div>').join('')+'</div></div>'+
+  '<div><div class="panel"><h2>'+t('emerg_h')+'</h2>'+(em.length?em.map(e=>'<div class="order"><div class="btns" style="justify-content:space-between"><strong>'+esc(e.name)+'</strong>'+badge(e.status)+'</div><div class="muted">'+esc(e.location)+(e.note?', '+esc(e.note):'')+'</div>'+(e.status==='Open'?'<button class="btn sm mt" onclick="emergAct(\''+e.id+'\',\'Acknowledged\')">'+t('acknowledge')+'</button>':'')+'</div>').join(''):'<p class="muted">'+t('no_emerg')+'</p>')+'</div>'+
+  '<div class="panel"><h2>'+t('k_amb')+'</h2>'+DB.ambulances.map(a=>'<div class="bedrow"><span class="grow">'+esc(a.id)+' <span class="muted">'+esc(a.driver)+'</span></span>'+badge(a.status)+'</div>').join('')+'</div>'+
+  '<div class="alert info">'+ic('lock',16)+' '+t('token_only_patient')+'</div></div></div>';
+}
+let qf={dept:'',st:'',q:''};
+function queueRows(){
+  const q=qf.q.trim().toLowerCase();
+  const rows=hTokens().filter(k=>(!qf.dept||k.dept===qf.dept)&&(!qf.st||k.status===qf.st)&&(!q||(k.code+' '+k.name).toLowerCase().includes(q))).sort((a,b)=>a.createdAt-b.createdAt);
+  if(!rows.length)return empty(t('no_results'));
+  const btn=(id,a,l,c)=>'<button class="btn sm '+(c||'')+'" onclick="tokAct(\''+id+'\',\''+a+'\')">'+t(l)+'</button>';
+  return '<div class="panel"><div class="tw"><table class="tbl"><thead><tr><th>'+t('token')+'</th><th>'+t('patient')+'</th><th>'+t('dept')+'</th><th>'+t('doctor')+'</th><th>'+t('status')+'</th><th>#</th><th>'+t('actions')+'</th></tr></thead><tbody>'+rows.map(k=>'<tr><td><strong>'+esc(k.code)+'</strong></td><td>'+esc(k.name)+'</td><td>'+esc(k.dept)+'</td><td>'+esc(k.doctor||'-')+'</td><td>'+badge(k.status)+'</td><td>'+(position(k)||'-')+'</td><td class="act">'+
+   (k.status==='Waiting'?btn(k.id,'verify','act_verify'):'')+(k.status==='Verified'?btn(k.id,'queue','act_queue'):'')+(k.status==='In Queue'?btn(k.id,'call','act_call'):'')+(k.status==='Called'?btn(k.id,'complete','act_complete'):'')+
+   (['Waiting','Verified','In Queue','Called'].includes(k.status)?btn(k.id,'cancel','cancel','ghost'):'')+'</td></tr>').join('')+'</tbody></table></div></div>';
+}
+function vQueue(){
+  const h=myH(),c={};hTokens().forEach(k=>{c[k.status]=(c[k.status]||0)+1});
+  return head(t('n_queue'),t('queue_sub'),'<button class="btn ghost" onclick="advanceQueue()">'+t('move_forward')+'</button><button class="btn" onclick="callNext()">'+t('call_next')+'</button>')+
+  '<div class="filters"><div class="searchbox">'+ic('search',16)+'<input type="search" placeholder="'+esc(t('token_search'))+'" value="'+esc(qf.q)+'" oninput="qf.q=this.value;$(\'#qTable\').innerHTML=queueRows()"></div>'+
+  '<select onchange="qf.dept=this.value;renderCurrent()"><option value="">'+t('all_depts')+'</option>'+opts(h.depts.map(d=>d.n),qf.dept)+'</select>'+
+  '<select onchange="qf.st=this.value;renderCurrent()"><option value="">'+t('all_status')+'</option>'+opts(['Waiting','Verified','In Queue','Called','Completed','Cancelled'],qf.st,x=>t('st_'+x))+'</select></div>'+
+  '<div id="qTable">'+queueRows()+'</div>';
+}
+const NEXT_ST={verify:'Verified',queue:'In Queue',call:'Called',complete:'Completed',cancel:'Cancelled'};
+const OK_FROM={verify:['Waiting'],queue:['Verified'],call:['In Queue','Verified'],complete:['Called'],cancel:['Waiting','Verified','In Queue','Called']};
+function tokAct(id,act){
+  if(!needRole('hospital'))return;loadDB();
+  const k=DB.tokens.find(x=>x.id===id&&x.hid===S.id);
+  if(!k||!OK_FROM[act]||!OK_FROM[act].includes(k.status))return;
+  k.status=NEXT_ST[act];saveDB();toast(t('updated'));renderCurrent();
+  if(current==='qrScanner')showScanResult();
+}
+function callNext(){
+  if(!needRole('hospital'))return;loadDB();
+  const n=hTokens().filter(k=>k.status==='In Queue'&&(!qf.dept||k.dept===qf.dept)).sort((a,b)=>a.createdAt-b.createdAt)[0];
+  if(!n){toast(t('queue_none'),'warn');return}
+  n.status='Called';saveDB();toast(t('now_calling',{c:n.code,r:n.room}));renderCurrent();
+}
+function advanceQueue(){
+  if(!needRole('hospital'))return;loadDB();
+  hTokens().filter(k=>k.status==='Called'&&(!qf.dept||k.dept===qf.dept)).forEach(k=>{k.status='Completed'});
+  saveDB();callNext();
+}
+function emergAct(id,st){
+  if(!needRole('hospital'))return;loadDB();
+  const e=DB.emerg.find(x=>x.id===id&&x.hid===S.id);if(e){e.status=st;saveDB();renderCurrent()}
+}
+
+/* QR scanner + manual verification */
+let scanner=null,lastScan=null;
+function vScanner(){
+  const pend=hTokens().filter(x=>x.status==='Waiting').slice(0,6);
+  return head(t('n_scanner'),t('scan_sub'))+'<div class="cols even"><div class="panel"><h2>'+t('scan_camera')+'</h2><div id="reader"><span>'+t('camera_off')+'</span></div><div class="btns mt"><button class="btn" id="scanBtn" onclick="toggleScan()">'+ic('qr')+' '+t('start_scan')+'</button></div></div>'+
+  '<div><div class="panel"><h2>'+t('manual_verify')+'</h2><p class="muted" style="margin-bottom:10px">'+t('manual_hint')+'</p><div class="inline"><input id="manIn" placeholder="CITY-GEN-005" autocapitalize="characters" onkeydown="if(event.key===\'Enter\')manualVerify()"><button class="btn" onclick="manualVerify()">'+t('verify')+'</button></div><div id="scanResult" class="mt">'+resultHTML()+'</div></div>'+
+  '<div class="panel"><h2>'+t('awaiting')+'</h2>'+(pend.length?pend.map(k=>'<div class="bedrow"><span class="grow"><strong>'+esc(k.code)+'</strong> <span class="muted">'+esc(k.name)+'</span></span><button class="btn ghost sm" onclick="$(\'#manIn\').value=\''+k.code+'\'">'+t('fill')+'</button></div>').join(''):'<p class="muted">'+t('none_awaiting')+'</p>')+'</div></div></div>';
+}
+function resultHTML(){
+  if(!lastScan)return '<p class="muted">'+t('scan_wait')+'</p>';
+  const r=lastScan,x=r.id&&DB.tokens.find(k=>k.id===r.id&&k.hid===S.id);
+  let h='<div class="alert '+(r.ok?'ok':'err')+'">'+esc(t(r.msg))+'</div>';
+  if(x){
+    h+='<dl class="kv"><dt>'+t('token')+'</dt><dd>'+esc(x.code)+'</dd><dt>'+t('patient')+'</dt><dd>'+esc(x.name)+'</dd><dt>'+t('hospital')+'</dt><dd>'+esc(myH().name)+'</dd><dt>'+t('dept')+'</dt><dd>'+esc(x.dept)+'</dd><dt>'+t('date')+'</dt><dd>'+fmtDate(x.date)+'</dd><dt>'+t('status')+'</dt><dd>'+badge(x.status)+'</dd></dl>'+
+     '<div class="btns mt">'+(x.status==='Verified'?'<button class="btn" onclick="tokAct(\''+x.id+'\',\'queue\')">'+t('act_queue')+'</button>':'')+(x.status==='In Queue'?'<button class="btn" onclick="tokAct(\''+x.id+'\',\'call\')">'+t('act_call')+'</button>':'')+'</div>';
+  }
+  return h;
+}
+function showScanResult(){const el=$('#scanResult');if(el)el.innerHTML=resultHTML()}
+function verifyInput(raw){
+  if(!needRole('hospital'))return;loadDB();
+  let code=String(raw||'').trim();
+  try{const p=JSON.parse(code);if(p&&p.code)code=p.code}catch(e){}
+  code=code.toUpperCase();
+  if(!code)return toast(t('fill_all'),'warn');
+  const x=DB.tokens.find(k=>k.code.toUpperCase()===code);
+  if(!x)lastScan={ok:false,msg:'token_not_found'};
+  else if(x.hid!==S.id)lastScan={ok:false,msg:'token_other_hospital'};
+  else if(x.date!==TODAY())lastScan={ok:false,msg:'token_old',id:x.id};
+  else if(x.status==='Cancelled'||x.status==='Completed')lastScan={ok:false,msg:'token_closed',id:x.id};
+  else if(x.status==='Waiting'){x.status='Verified';saveDB();lastScan={ok:true,msg:'token_verified',id:x.id}}
+  else lastScan={ok:true,msg:'token_already',id:x.id};
+  showScanResult();toast(t(lastScan.msg),lastScan.ok?'ok':'error');
+}
+function manualVerify(){verifyInput(($('#manIn')||{}).value)}
+async function stopScan(){
+  const s=scanner;scanner=null;
+  if(s){try{await s.stop();s.clear()}catch(e){}}
+  const b=$('#scanBtn');if(b)b.innerHTML=ic('qr')+' '+t('start_scan');
+  const r=$('#reader');if(r&&!r.children.length)r.innerHTML='<span>'+esc(t('camera_off'))+'</span>';
+}
+async function toggleScan(){
+  if(!needRole('hospital'))return;
+  if(scanner){await stopScan();return}
+  const r=$('#reader');
+  if(!window.Html5Qrcode||!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){r.innerHTML='<span>'+esc(t('camera_unavailable'))+'</span>';toast(t('camera_unavailable'),'warn');return}
+  try{
+    r.innerHTML='';scanner=new Html5Qrcode('reader');
+    await scanner.start({facingMode:'environment'},{fps:10,qrbox:{width:220,height:220}},txt=>{verifyInput(txt);stopScan()},()=>{});
+    $('#scanBtn').innerHTML=ic('x',18)+' '+t('stop_scan');
+  }catch(e){scanner=null;r.innerHTML='<span>'+esc(t('camera_unavailable'))+'</span>';toast(t('camera_unavailable'),'warn')}
+}
+
+/* hospital operations */
+let hopsTab='doctors';
+function vHospOps(){
+  const h=myH(),tabs=[['doctors','n_doctors'],['beds','n_beds'],['emerg','emerg_h'],['appts','n_appts']];
+  let body='';
+  if(hopsTab==='doctors')body='<div class="list">'+h.doctors.map(d=>'<div class="li"><div class="grow"><strong>'+esc(d.name)+'</strong><div class="muted">'+esc(d.dept)+', '+t('room')+' '+esc(d.room)+'</div></div>'+badge(d.available?'Available':'Unavailable')+'<button class="btn ghost sm" onclick="toggleDoc(\''+d.id+'\')">'+t(d.available?'mark_unavail':'mark_avail')+'</button></div>').join('')+'</div>';
+  if(hopsTab==='beds')body='<div class="panel">'+Object.entries(h.beds).filter(([,b])=>b.total>0).map(([n,b])=>'<div class="bedrow"><span class="nm">'+esc(t('bed_'+n))+'</span><div class="bar'+(b.free/b.total<.15?' low':'')+'"><i style="width:'+Math.round(b.free/b.total*100)+'%"></i></div><span class="ct">'+b.free+' / '+b.total+'</span><div class="stepper"><button onclick="bedAdj(\''+n+'\',-1)" aria-label="-">−</button><button onclick="bedAdj(\''+n+'\',1)" aria-label="+">+</button></div></div>').join('')+'</div>';
+  if(hopsTab==='emerg'){const em=DB.emerg.filter(e=>e.hid===S.id).sort((a,b)=>b.createdAt-a.createdAt);body=em.length?'<div class="list">'+em.map(e=>'<div class="li"><div class="grow"><strong>'+esc(e.name)+'</strong><div class="muted">'+esc(e.location)+(e.note?', '+esc(e.note):'')+'</div></div>'+badge(e.status)+(e.status==='Open'?'<button class="btn sm" onclick="emergAct(\''+e.id+'\',\'Acknowledged\')">'+t('acknowledge')+'</button>':'')+(e.status!=='Resolved'?'<button class="btn ghost sm" onclick="emergAct(\''+e.id+'\',\'Resolved\')">'+t('resolve')+'</button>':'')+'</div>').join('')+'</div>':empty(t('no_emerg'))}
+  if(hopsTab==='appts'){const a=DB.appts.filter(x=>x.hid===S.id&&x.status!=='Cancelled').sort((x,y)=>(x.date+x.time).localeCompare(y.date+y.time));body=a.length?'<div class="panel"><div class="tw"><table class="tbl"><thead><tr><th>'+t('date')+'</th><th>'+t('time')+'</th><th>'+t('patient')+'</th><th>'+t('doctor')+'</th><th>'+t('dept')+'</th></tr></thead><tbody>'+a.map(x=>'<tr><td>'+fmtDate(x.date)+'</td><td>'+esc(x.time)+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.doctor)+'</td><td>'+esc(x.dept)+'</td></tr>').join('')+'</tbody></table></div></div>':empty(t('no_appt'))}
+  return head(t('n_ops'),t('ops_sub'))+'<div class="tabs">'+tabs.map(x=>'<button class="'+(hopsTab===x[0]?'on':'')+'" onclick="hopsTab=\''+x[0]+'\';renderCurrent()">'+t(x[1])+'</button>').join('')+'</div>'+body;
+}
+function toggleDoc(id){if(!needRole('hospital'))return;loadDB();const d=myH().doctors.find(x=>x.id===id);if(d){d.available=!d.available;saveDB();renderCurrent()}}
+function bedAdj(type,dlt){if(!needRole('hospital'))return;loadDB();const b=myH().beds[type];if(b){b.free=Math.max(0,Math.min(b.total,b.free+dlt));saveDB();renderCurrent()}}
+
+/* =========================================================
+   ADMIN / DELIVERY / AMBULANCE PORTALS
+   ========================================================= */
+function vAdmin(){
+  const pats=DB.users.length;
+  return head(t('n_overview'),t('admin_sub'),'<button class="btn ghost" onclick="resetDemo()">'+t('reset_demo')+'</button>')+
+  '<div class="stats">'+stat(DB.hospitals.length,'k_hospitals','building')+stat(pats,'k_users','users')+stat(DB.tokens.filter(x=>x.date===TODAY()).length,'k_tokens','ticket')+stat(DB.appts.length,'n_appts','calendar')+stat(DB.orders.length,'orders','pill')+stat(DB.ambReqs.length,'k_amb_req','truck')+stat(DB.homecare.length,'n_homecare','heart')+'</div>'+
+  '<div class="panel"><h2>'+t('n_hospitals')+'</h2><div class="tw"><table class="tbl"><thead><tr><th>ID</th><th>'+t('hospital')+'</th><th>'+t('k_active_queue')+'</th><th>'+t('k_beds')+'</th><th>'+t('status')+'</th><th></th></tr></thead><tbody>'+DB.hospitals.map(h=>'<tr><td>'+esc(h.id)+'</td><td><strong>'+esc(h.name)+'</strong></td><td>'+queueLen(h.id)+'</td><td>'+bedsFree(h)+'</td><td>'+badge(h.active?'Available':'Unavailable')+'</td><td class="act"><button class="btn ghost sm" onclick="toggleHosp(\''+h.id+'\')">'+t(h.active?'suspend':'activate')+'</button></td></tr>').join('')+'</tbody></table></div></div>'+
+  '<div class="panel"><h2>'+t('k_users')+'</h2><div class="tw"><table class="tbl"><thead><tr><th>'+t('fullname')+'</th><th>'+t('email')+'</th></tr></thead><tbody>'+DB.users.map(u=>'<tr><td>'+esc(u.name)+'</td><td>'+esc(u.email)+'</td></tr>').join('')+'</tbody></table></div></div>';
+}
+function toggleHosp(id){if(!needRole('admin'))return;loadDB();const h=hosp(id);if(h){h.active=!h.active;saveDB();renderCurrent()}}
+function resetDemo(){if(!needRole('admin'))return;try{localStorage.removeItem(LS_DB)}catch(e){}loadDB();toast(t('reset_done'));renderCurrent()}
+function vAdminService(){
+  const hc=DB.homecare.slice().sort((a,b)=>b.createdAt-a.createdAt);
+  return head(t('n_services'),t('services_sub'))+
+  '<div class="panel"><h2>'+t('n_homecare')+'</h2>'+(hc.length?'<div class="tw"><table class="tbl"><thead><tr><th>'+t('patient')+'</th><th>'+t('n_homecare')+'</th><th>'+t('date')+'</th><th>'+t('status')+'</th><th></th></tr></thead><tbody>'+hc.map(h=>'<tr><td>'+esc(h.name)+'</td><td>'+esc(h.service)+'</td><td>'+fmtDate(h.date)+'</td><td>'+badge(h.status)+'</td><td class="act">'+(h.status==='Requested'?'<button class="btn sm" onclick="hcAct(\''+h.id+'\',\'Assigned\')">'+t('assign')+'</button>':'')+(h.status==='Assigned'?'<button class="btn sm" onclick="hcAct(\''+h.id+'\',\'Completed\')">'+t('act_complete')+'</button>':'')+'</td></tr>').join('')+'</tbody></table></div>':empty(t('no_requests')))+'</div>'+
+  '<div class="panel"><h2>'+t('orders')+'</h2>'+(DB.orders.length?'<div class="tw"><table class="tbl"><thead><tr><th>#</th><th>'+t('patient')+'</th><th>'+t('total')+'</th><th>'+t('status')+'</th></tr></thead><tbody>'+DB.orders.slice().reverse().map(o=>'<tr><td>'+esc(o.id.slice(-5).toUpperCase())+'</td><td>'+esc(o.name)+'</td><td>₹'+o.total+'</td><td>'+badge(o.status)+'</td></tr>').join('')+'</tbody></table></div>':empty(t('no_orders')))+'</div>';
+}
+function hcAct(id,st){if(!needRole('admin'))return;loadDB();const h=DB.homecare.find(x=>x.id===id);if(h){h.status=st;saveDB();renderCurrent()}}
+
+const DELIVERY_NEXT={'Order Placed':['Preparing','act_prep'],'Preparing':['Packed','act_pack'],'Packed':['Out for Delivery','act_out'],'Out for Delivery':['Delivered','act_deliver']};
+function vDelivery(){
+  const o=DB.orders.slice().sort((a,b)=>a.createdAt-b.createdAt),open=o.filter(x=>x.status!=='Delivered');
+  return head(t('n_deliveries'),t('delivery_sub'))+
+  '<div class="stats">'+stat(o.filter(x=>x.status==='Order Placed'||x.status==='Preparing').length,'k_to_prepare','pill')+stat(o.filter(x=>x.status==='Packed'||x.status==='Out for Delivery').length,'k_on_way','truck')+stat(o.filter(x=>x.status==='Delivered').length,'st_Delivered','check')+'</div>'+
+  (open.length?'<div class="list" style="padding-top:2px;padding-bottom:2px">'+open.map(x=>'<div class="order"><div class="btns" style="justify-content:space-between;align-items:center"><strong>#'+esc(x.id.slice(-5).toUpperCase())+', '+esc(x.name)+'</strong>'+badge(x.status)+'</div><div class="muted">'+x.items.map(i=>esc(i.name)+' x'+i.qty).join(', ')+'</div><div class="muted">'+esc(x.address)+', '+esc(x.phone)+'</div><div class="steps" aria-hidden="true">'+ORDER_FLOW.map((s,j)=>'<i class="'+(j<=ORDER_FLOW.indexOf(x.status)?'done':'')+'"></i>').join('')+'</div><button class="btn sm mt" onclick="orderAdvance(\''+x.id+'\')">'+t(DELIVERY_NEXT[x.status][1])+'</button></div>').join('')+'</div>':empty(t('no_open_orders')));
+}
+function orderAdvance(id){if(!needRole('delivery'))return;loadDB();const o=DB.orders.find(x=>x.id===id);if(o&&DELIVERY_NEXT[o.status]){o.status=DELIVERY_NEXT[o.status][0];saveDB();toast(t('updated'));renderCurrent()}}
+
+function vAmbPortal(){
+  const rq=DB.ambReqs.slice().sort((a,b)=>(a.type==='Emergency'?0:1)-(b.type==='Emergency'?0:1)||b.createdAt-a.createdAt);
+  const btn=(id,st,l)=>'<button class="btn sm" onclick="ambAct(\''+id+'\',\''+st+'\')">'+t(l)+'</button>';
+  return head(t('n_requests'),t('amb_portal_sub'))+'<div class="cols"><div><h2 class="sh">'+t('n_requests')+'</h2>'+(rq.length?'<div class="list">'+rq.map(a=>'<div class="li"><div class="grow"><strong>'+esc(t(a.type==='Emergency'?'amb_emergency':'amb_transfer'))+', '+esc(a.name)+'</strong><div class="muted">'+esc(a.pickup)+'</div><div class="muted">'+esc(a.phone)+', '+esc((hosp(a.hid)||{}).name||'')+(a.amb?', '+esc(a.amb):'')+'</div></div>'+badge(a.status)+(a.status==='Requested'?btn(a.id,'Dispatched','act_dispatch'):'')+(a.status==='Dispatched'?btn(a.id,'Arrived','act_arrived'):'')+(a.status==='Arrived'?btn(a.id,'Completed','act_complete'):'')+'</div>').join('')+'</div>':empty(t('no_amb_req')))+'</div>'+
+  '<div><h2 class="sh">'+t('fleet')+'</h2><div class="panel">'+DB.ambulances.map(a=>'<div class="bedrow"><span class="grow"><strong>'+esc(a.id)+'</strong> <span class="muted">'+esc(a.driver)+'</span></span>'+badge(a.status)+'</div>').join('')+'</div></div></div>';
+}
+function ambAct(id,st){
+  if(!needRole('ambulance'))return;loadDB();
+  const r=DB.ambReqs.find(x=>x.id===id);if(!r)return;
+  if(st==='Dispatched'){
+    const v=DB.ambulances.find(a=>a.status==='Available');
+    if(!v)return toast(t('no_amb_free'),'warn');
+    v.status='Busy';r.amb=v.id;
+  }
+  if(st==='Completed'){const v=DB.ambulances.find(a=>a.id===r.amb);if(v)v.status='Available'}
+  r.status=st;saveDB();toast(t('updated'));renderCurrent();
+}
+
+/* ---------- boot ---------- */
+function init(){
+  loadDB();
+  const langOpts='<option value="en">English</option><option value="ta">தமிழ்</option><option value="hi">हिन्दी</option>';
+  ['langGate','langApp'].forEach(i=>{$('#'+i).innerHTML=langOpts;$('#'+i).value=lang});
+  document.documentElement.lang=lang;
+  document.querySelectorAll('.logo').forEach(e=>{e.innerHTML=LOGO});
+  S=getSession();
+  if(S&&S.loggedIn&&ROLE_HOME[S.role]&&(S.role!=='hospital'||hosp(S.id))){
+    unlockApp();
+    const p=location.hash.replace(/^#\/?/,'');
+    go(p&&ROUTES[p]?p:ROLE_HOME[S.role]);
+  }else{S=null;lockApp()}
+}
+init();
+</script>
+</body>
+</html>
